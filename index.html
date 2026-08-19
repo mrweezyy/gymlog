@@ -420,10 +420,8 @@
     </div>
     </div>
     <div class="cfg-panel" id="cfgPanel">
-      <label>bot token</label>
-      <input type="password" id="botToken" placeholder="1234567890:AAF..." autocomplete="off">
-      <label>chat id</label>
-      <input type="text" id="chatId" placeholder="-1001234567890">
+      <label>relay secret</label>
+      <input type="password" id="relaySecret" placeholder="paste your APP_SHARED_SECRET" autocomplete="off">
       <button class="cfg-save" onclick="saveCfg()">save</button>
     </div>
 
@@ -514,8 +512,7 @@
 <div class="toast" id="toast"></div>
 
 <script>
-  const DEFAULT_TOKEN = '8253561634:AAFEO1V9uI4NSu1daJx4Xjj39YT435sqZYA';
-  const DEFAULT_CHAT  = '-1003525933995';
+  const RELAY_URL = 'https://gymlog-relay.mrweezy.workers.dev';
   const MAX_CORE_SETS = 3;
   const REST_OPTIONS  = ['5s','10s','15s'];
   const BIG3 = ['squat','bench press','deadlift'];
@@ -621,8 +618,7 @@
 
   function init() {
     const s = getSaved();
-    document.getElementById('botToken').value = s.token  || DEFAULT_TOKEN;
-    document.getElementById('chatId').value   = s.chatId || DEFAULT_CHAT;
+    document.getElementById('relaySecret').value = s.relaySecret || '';
     document.documentElement.setAttribute('data-theme', localStorage.getItem('gymlog_theme')||'light');
     updateDot();
     const restored = restoreSession();
@@ -630,25 +626,7 @@
     if (!restored) { addMain(); addCardio(); addCoreSet(); }
     renderTemplates(); renderPlanner(); renderPeriodization();
 
-    // Force seed known June 2026 workout days (runs once, merges with existing)
-    (function seedJuneDays() {
-      const now = new Date();
-      if (now.getFullYear() === 2026 && now.getMonth() === 5) {
-        try {
-          let days = new Set([1, 2, 14]);
-          const existing = localStorage.getItem('gymlog_cal_days');
-          if (existing) {
-            const parsed = JSON.parse(existing);
-            if (parsed.month === 5 && parsed.year === 2026) {
-              parsed.days.forEach(d => days.add(d));
-            }
-          }
-          localStorage.setItem('gymlog_cal_days', JSON.stringify({
-            month: 5, year: 2026, days: [...days]
-          }));
-        } catch {}
-      }
-    })();
+    initRemoteSync();
 
     // Auto-save on any input change in the logger
     document.getElementById('page-logger').addEventListener('input', saveSession);
@@ -691,17 +669,18 @@
 
   /* CONFIG */
   function getSaved() { try { return JSON.parse(localStorage.getItem('gymlog_cfg')||'{}'); } catch { return {}; } }
-  function getCreds() { return { token: document.getElementById('botToken').value.trim()||DEFAULT_TOKEN, chatId: document.getElementById('chatId').value.trim()||DEFAULT_CHAT }; }
+  function getRelaySecret() { return document.getElementById('relaySecret').value.trim() || getSaved().relaySecret || ''; }
   function updateDot() {
-    const {token,chatId}=getCreds(), ok=!!(token&&chatId);
+    const ok = !!getRelaySecret();
     document.getElementById('tgDot').className='tg-dot'+(ok?'':' off');
-    document.getElementById('tgLabel').textContent=ok?'telegram connected':'not configured';
+    document.getElementById('tgLabel').textContent=ok?'relay connected':'not configured';
   }
   function toggleCfg() { document.getElementById('cfgPanel').classList.toggle('open'); }
   function saveCfg() {
-    localStorage.setItem('gymlog_cfg',JSON.stringify({token:document.getElementById('botToken').value.trim(),chatId:document.getElementById('chatId').value.trim()}));
+    localStorage.setItem('gymlog_cfg',JSON.stringify({relaySecret:document.getElementById('relaySecret').value.trim()}));
     document.getElementById('cfgPanel').classList.remove('open');
     updateDot(); showToast('Saved','ok');
+    initRemoteSync();
   }
 
   /* CLEAR MODAL */
@@ -924,100 +903,52 @@
     return msg;
   }
 
-  /* CALENDAR */
-  function buildCalendar(gymDays, logDate) {
-    const now = logDate || new Date();
-    const year = now.getFullYear();
-    const month = now.getMonth();
-    const today = new Date().getDate(); // real today, for ⬜ vs 🔴 cutoff only when viewing current month
-    const isCurrentMonth = (now.getFullYear()===new Date().getFullYear() && now.getMonth()===new Date().getMonth());
-    const monthName = now.toLocaleString('en-US', { month: 'long' });
-    const daysInMonth = new Date(year, month + 1, 0).getDate();
-
-    const emoji = d => {
-      if (gymDays.has(d)) return `${String(d).padStart(2,'0')}✅`;
-      if (!isCurrentMonth || d < today) return `${String(d).padStart(2,'0')}🔴`;
-      return `${String(d).padStart(2,'0')}⬜`;
-    };
-
-    let msg = `📅 *${monthName} ${year}*\n\n`;
-    const dayNums = [];
-    for (let d = 1; d <= daysInMonth; d++) dayNums.push(d);
-    for (let i = 0; i < dayNums.length; i += 5) {
-      msg += dayNums.slice(i, i + 5).map(emoji).join(' ') + '\n';
+  /* RELAY */
+  async function relayFetch(path, options = {}) {
+    const secret = getRelaySecret();
+    if (!secret) return { ok: false, error: 'relay not configured' };
+    try {
+      const res = await fetch(RELAY_URL + path, {
+        ...options,
+        headers: { 'Content-Type': 'application/json', 'X-App-Secret': secret, ...(options.headers||{}) }
+      });
+      return await res.json();
+    } catch {
+      return { ok: false, error: 'network error' };
     }
-    return msg.trimEnd();
   }
 
-  function getCalendarMsgId() {
-    try { return localStorage.getItem('gymlog_cal_msg_id') || null; } catch { return null; }
-  }
-  function saveCalendarMsgId(id) {
-    try { localStorage.setItem('gymlog_cal_msg_id', String(id)); } catch {}
-  }
-
-  async function fetchPreviousGymDays(logDate) {
-    try {
-      const stored = localStorage.getItem('gymlog_cal_days');
-      if (stored) {
-        const { month, year, days } = JSON.parse(stored);
-        if (month === logDate.getMonth() && year === logDate.getFullYear()) {
-          return new Set(days);
-        }
-      }
-    } catch {}
-    return new Set();
-  }
-
-  function saveCalendarDays(gymDays, logDate) {
-    try {
-      localStorage.setItem('gymlog_cal_days', JSON.stringify({
-        month: logDate.getMonth(),
-        year: logDate.getFullYear(),
-        days: [...gymDays]
-      }));
-    } catch {}
-  }
-
-  async function sendCalendar(token, chatId, logDate) {
-    const logDay = logDate.getDate();
-    const gymDays = await fetchPreviousGymDays(logDate);
-    gymDays.add(logDay);
-    saveCalendarDays(gymDays, logDate);
-
-    const calText = buildCalendar(gymDays, logDate);
-
-    const res = await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ chat_id: chatId, text: calText, parse_mode: 'Markdown' })
-    });
-    const data = await res.json();
-    if (data.ok) saveCalendarMsgId(data.result.message_id);
-    return data.ok;
+  async function sendCalendar(logDate) {
+    const dateStr = `${logDate.getFullYear()}-${String(logDate.getMonth()+1).padStart(2,'0')}-${String(logDate.getDate()).padStart(2,'0')}`;
+    return relayFetch('/telegram/calendar', { method: 'POST', body: JSON.stringify({ logDate: dateStr }) });
   }
 
   async function sendToTelegram() {
-    const {token,chatId}=getCreds();
-    if(!token||!chatId){showToast('Configure Telegram first','err');document.getElementById('cfgPanel').classList.add('open');return;}
-    const msg=buildMessage(); if(!msg){showToast('Nothing to send','err');return;}
+    const msg=buildMessage(); if(!msg){showToast('Nothing to log','err');return;}
     const logDate=getLogDate();
-    const btn=document.getElementById('sendBtn'); btn.disabled=true; btn.textContent='sending…';
-    try {
-      const res=await fetch(`https://api.telegram.org/bot${token}/sendMessage`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({chat_id:chatId,text:msg,parse_mode:'Markdown'})});
-      const data=await res.json();
-      if (data.ok) {
-        await sendCalendar(token, chatId, logDate);
-        saveWorkoutToHistory(logDate);
-        showToast('Sent to Telegram!','ok');
-        // Always snap the date back to today after a send, no exceptions
-        overrideDate = null;
-        renderDateStr();
-        saveSession();
-      } else {
-        showToast(data.description||'Failed','err');
-      }
-    } catch { showToast('Network error','err'); }
+    const btn=document.getElementById('sendBtn'); btn.disabled=true; btn.textContent='saving…';
+
+    // Save locally first, always — Telegram being down/misconfigured
+    // should never cost you a logged workout.
+    saveWorkoutToHistory(logDate);
+    overrideDate = null;
+    renderDateStr();
+    saveSession();
+
+    if(!getRelaySecret()){
+      showToast('Saved locally (relay not configured)','ok');
+      btn.disabled=false; btn.textContent='send to telegram';
+      return;
+    }
+
+    btn.textContent='sending…';
+    const result = await relayFetch('/telegram/send', { method: 'POST', body: JSON.stringify({ text: msg }) });
+    if (result.ok) {
+      await sendCalendar(logDate);
+      showToast('Saved & sent to Telegram!','ok');
+    } else {
+      showToast('Saved locally — Telegram failed: '+(result.error||'unknown error'),'err');
+    }
     btn.disabled=false; btn.textContent='send to telegram';
   }
 
@@ -1235,7 +1166,40 @@
 
   /* HISTORY */
   function loadHistory() { try { return JSON.parse(localStorage.getItem('gymlog_history')||'[]'); } catch { return []; } }
-  function saveHistory(h) { try { localStorage.setItem('gymlog_history', JSON.stringify(h)); } catch {} }
+  function saveHistory(h) {
+    try { localStorage.setItem('gymlog_history', JSON.stringify(h)); } catch {}
+    // Push to the relay in the background so other devices pick it up next time
+    // they open the app. Non-blocking — local save above already succeeded.
+    if (getRelaySecret()) {
+      relayFetch('/history', { method: 'PUT', body: JSON.stringify(h) });
+    }
+  }
+
+  const historyContentKey = e => JSON.stringify({ mains: e.mains, cardios: e.cardios, cores: e.cores });
+
+  async function initRemoteSync() {
+    if (!getRelaySecret()) return;
+    const result = await relayFetch('/history');
+    if (!result.ok || !Array.isArray(result.history)) return;
+
+    const local = loadHistory();
+    const localKeys = new Set(local.map(e => `${e.date}|${e.name}|${historyContentKey(e)}`));
+    const newFromRemote = result.history.filter(e => !localKeys.has(`${e.date}|${e.name}|${historyContentKey(e)}`));
+
+    if (newFromRemote.length) {
+      const merged = [...local, ...newFromRemote].sort((a, b) => {
+        if (a.date !== b.date) return b.date.localeCompare(a.date);
+        return (b.id || 0) - (a.id || 0);
+      });
+      localStorage.setItem('gymlog_history', JSON.stringify(merged));
+      if (document.getElementById('page-history').classList.contains('active')) renderHistory();
+    }
+    // Push the fully-merged set back up too, so every device converges on the same data
+    const finalLocal = loadHistory();
+    if (finalLocal.length !== result.history.length) {
+      relayFetch('/history', { method: 'PUT', body: JSON.stringify(finalLocal) });
+    }
+  }
 
   function saveWorkoutToHistory(logDate) {
     if (!mains.length && !cardios.length && !cores.length) return;
