@@ -423,6 +423,9 @@
       <label>relay secret</label>
       <input type="password" id="relaySecret" placeholder="paste your APP_SHARED_SECRET" autocomplete="off">
       <button class="cfg-save" onclick="saveCfg()">save</button>
+      <div style="height:12px;"></div>
+      <label>calendar</label>
+      <button class="cfg-save" style="background:none;border:1px solid var(--border);color:var(--text);" onclick="rebuildCalendar()">rebuild this month's calendar from history</button>
     </div>
 
     <div style="margin-bottom:1.5rem;">
@@ -921,6 +924,28 @@
   async function sendCalendar(logDate) {
     const dateStr = `${logDate.getFullYear()}-${String(logDate.getMonth()+1).padStart(2,'0')}-${String(logDate.getDate()).padStart(2,'0')}`;
     return relayFetch('/telegram/calendar', { method: 'POST', body: JSON.stringify({ logDate: dateStr }) });
+  }
+
+  async function rebuildCalendar() {
+    if (!getRelaySecret()) { showToast('Set your relay secret first', 'err'); return; }
+    const now = new Date();
+    const year = now.getFullYear(), month = now.getMonth();
+    const history = loadHistory();
+    const days = [...new Set(
+      history
+        .filter(e => {
+          const d = new Date(e.date + 'T12:00:00');
+          return d.getFullYear() === year && d.getMonth() === month;
+        })
+        .map(e => new Date(e.date + 'T12:00:00').getDate())
+    )];
+    if (!days.length) { showToast('No workouts found in history for this month', 'err'); return; }
+    const result = await relayFetch('/telegram/calendar/rebuild', { method: 'POST', body: JSON.stringify({ year, month, days }) });
+    if (result.ok) {
+      showToast(`Calendar rebuilt — ${result.count} day${result.count===1?'':'s'} marked`, 'ok');
+    } else {
+      showToast('Rebuild failed: ' + (result.error||'unknown error'), 'err');
+    }
   }
 
   async function sendToTelegram() {
