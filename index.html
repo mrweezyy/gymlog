@@ -11,7 +11,7 @@
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     :root {
       --bg: #f7f6f3; --surface: #ffffff; --border: #d8d5ce; --border-strong: #b8b4aa;
-      --text: #0a0a08; --text-muted: #5a5750; --text-faint: #9a9790;
+      --text: #0a0a08; --text-muted: #5a5750; --text-faint: #726c60;
       --accent: #0a0a08; --accent-fg: #f7f6f3; --green: #1a6647; --red: #b83232;
       --mono: 'DM Mono', monospace; --sans: 'DM Sans', sans-serif;
       --radius: 10px; --radius-lg: 14px;
@@ -24,7 +24,7 @@
     }
     [data-theme="purple"] {
       --bg: #100d1a; --surface: #1a1528; --border: #3a3050; --border-strong: #6a58a0;
-      --text: #f0ecff; --text-muted: #b8aee0; --text-faint: #7a6eaa;
+      --text: #f0ecff; --text-muted: #b8aee0; --text-faint: #8f82c4;
       --accent: #c084fc; --accent-fg: #100d1a; --green: #34d399; --red: #f87171;
       --bg-card: #1a1528;
     }
@@ -178,10 +178,6 @@
     .core-ex-meta { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin-left: 13px; }
     .core-ex-meta-label { font-size: 10px; font-family: var(--mono); color: var(--text-faint); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 3px; }
     .core-ex-meta input[type=number] { font-family: var(--mono); font-size: 13px; padding: 5px 8px; height: 30px; background: var(--bg); text-align: center; width: 100%; }
-    .rest-presets { display: flex; gap: 3px; }
-    .rest-btn { flex: 1; height: 30px; border: 1px solid var(--border); border-radius: 6px; background: var(--bg); color: var(--text-muted); font-family: var(--mono); font-size: 11px; cursor: pointer; transition: background 0.1s, border-color 0.1s, color 0.1s; }
-    .rest-btn:hover { border-color: var(--border-strong); color: var(--text); }
-    .rest-btn.active { background: var(--accent); border-color: var(--accent); color: var(--accent-fg); }
     .core-connector { display: flex; align-items: center; gap: 8px; margin: 2px 0 8px 17px; }
     .core-connector-line { width: 1px; height: 12px; background: var(--border); }
     .core-add-ex-btn { width: 100%; margin: 4px 0 12px; font-size: 12px; font-family: var(--mono); color: var(--text); background: none; border: 1px dashed var(--border-strong); border-radius: var(--radius); padding: 5px; cursor: pointer; }
@@ -235,8 +231,7 @@
     .tpl-ex-row { display: flex; align-items: center; gap: 6px; margin-bottom: 5px; }
     .tpl-ex-row input { flex: 1; font-size: 13px; padding: 5px 8px; height: 30px; }
     .tpl-ex-row input.small { width: 80px; flex: none; font-family: var(--mono); text-align: center; }
-    .tpl-ex-row .rest-presets { flex: none; }
-    .tpl-ex-row .rest-btn { font-size: 10px; height: 30px; }
+
     .tpl-remove-ex { background: none; border: none; color: var(--text-faint); font-size: 14px; cursor: pointer; flex-shrink: 0; }
     .tpl-remove-ex:hover { color: var(--red); }
     .tpl-add-ex { font-size: 11px; font-family: var(--mono); color: var(--text); background: none; border: 1px dashed var(--border-strong); border-radius: var(--radius); padding: 4px 10px; cursor: pointer; margin-top: 2px; }
@@ -339,7 +334,7 @@
 <!-- NAVBAR -->
 <div class="navbar">
   <div class="navbar-inner">
-    <div class="logo">gym_log</div>
+    <div class="logo">gym_log <span style="font-size:10px;color:var(--text-faint);font-weight:400;">v3.3</span></div>
     <div class="navbar-right">
       <button class="theme-toggle" onclick="toggleTheme()" title="toggle theme"></button>
       <button class="hamburger" onclick="openMenu()"><span></span><span></span><span></span></button>
@@ -361,9 +356,6 @@
     <button class="menu-item" id="mi-templates"      onclick="switchPage('templates');closeMenu()"><span class="menu-item-icon">⚡</span>templates</button>
     <button class="menu-item" id="mi-planner"        onclick="switchPage('planner');closeMenu()"><span class="menu-item-icon">📅</span>workout planner</button>
     <button class="menu-item" id="mi-periodization"  onclick="switchPage('periodization');closeMenu()"><span class="menu-item-icon">📈</span>periodization</button>
-    <hr class="menu-divider">
-    <div class="menu-section-label">telegram</div>
-    <button class="menu-item" onclick="toggleCfg();closeMenu()"><span class="menu-item-icon">⚙️</span>configure bot</button>
   </div>
 </div>
 
@@ -462,6 +454,7 @@
     <div class="section-body" id="sec-core">
       <div class="core-list" id="coreList"></div>
       <button class="add-any-btn" id="addCoreBtn" onclick="addCoreSet()">+ add set</button>
+      <datalist id="coreExOptions"></datalist>
     </div>
 
     <hr class="divider">
@@ -517,7 +510,6 @@
 <script>
   const RELAY_URL = 'https://gymlog-relay.mrweezy.workers.dev';
   const MAX_CORE_SETS = 3;
-  const REST_OPTIONS  = ['5s','10s','15s'];
   const BIG3 = ['squat','bench press','deadlift'];
 
   let mains=[], cardios=[], cores=[], uid=0;
@@ -549,7 +541,7 @@
       overrideDate = session.overrideDate || null;
       if (!mains.length) { const id=++uid; mains.push({id,name:'',sets:[{reps:'',weight:'',diff:''}],notes:''}); }
       if (!cardios.length) { const id=++uid; cardios.push({id,type:'',duration:'',notes:''}); }
-      if (!cores.length) { const setId=++uid,ex1=++uid; cores.push({id:setId,exercises:[{id:ex1,name:'',duration:'',restAfter:'5s'}]}); }
+      if (!cores.length) { const setId=++uid,ex1=++uid; cores.push({id:setId,exercises:[{id:ex1,name:'',duration:''}]}); }
       renderMain(); renderCardio(); renderCore();
       return true;
     } catch(e) { return false; }
@@ -628,6 +620,7 @@
     renderDateStr();
     if (!restored) { addMain(); addCardio(); addCoreSet(); }
     renderTemplates(); renderPlanner(); renderPeriodization();
+    renderCoreExDatalist();
 
     initRemoteSync();
 
@@ -784,25 +777,14 @@
   function addCoreSet() {
     if(cores.length>=MAX_CORE_SETS) return;
     const setId=++uid;
-    let exercises;
-    if(cores.length>0) {
-      // Copy exercises from the last set, with fresh IDs
-      exercises = cores[cores.length-1].exercises.map(ex=>({
-        id: ++uid,
-        name: ex.name,
-        duration: ex.duration,
-        restAfter: ex.restAfter
-      }));
-    } else {
-      exercises = [{id:++uid,name:'',duration:'',restAfter:'5s'}];
-    }
+    const exercises = [{id:++uid,name:'',duration:''}];
     cores.push({id:setId,exercises});
     renderCore(); saveSession(); focus(`[data-cn="${exercises[0].id}"]`);
   }
   function removeCoreSet(id) { cores=cores.filter(s=>s.id!==id); renderCore(); saveSession(); }
   function addCoreEx(setId) {
     const s=cores.find(s=>s.id===setId); if(!s||s.exercises.length>=3) return;
-    const id=++uid; s.exercises.push({id,name:'',duration:'',restAfter:'5s'});
+    const id=++uid; s.exercises.push({id,name:'',duration:''});
     renderCore(); saveSession(); focus(`[data-cn="${id}"]`);
   }
   function removeCoreEx(setId,exId) {
@@ -810,19 +792,6 @@
     if(s&&s.exercises.length>1){s.exercises=s.exercises.filter(e=>e.id!==exId);renderCore();saveSession();}
   }
   function updCoreEx(setId,exId,f,v) { const s=cores.find(s=>s.id===setId); if(!s) return; const e=s.exercises.find(e=>e.id===exId); if(e) { e[f]=v; saveSession(); } }
-  function setCoreExRest(setId,exId,v) {
-    const s=cores.find(s=>s.id===setId); if(!s) return;
-    const e=s.exercises.find(e=>e.id===exId); if(!e) return;
-    e.restAfter = e.restAfter===v ? '' : v;
-    // Surgical update — only toggle button classes
-    const container = document.querySelector(`[data-core-ex-id="${exId}"] .rest-presets`);
-    if(container) {
-      container.querySelectorAll('.rest-btn').forEach(btn=>{
-        btn.classList.toggle('active', btn.dataset.rest===e.restAfter);
-      });
-    }
-    saveSession();
-  }
   function renderCore() {
     const list=document.getElementById('coreList'); list.innerHTML='';
     cores.forEach((s,si)=>{
@@ -833,7 +802,7 @@
           <div class="core-ex" data-core-ex-id="${ex.id}">
             <div class="core-ex-top">
               <div class="core-ex-bullet"></div>
-              <input class="core-ex-name" type="text" data-cn="${ex.id}" placeholder="exercise name" value="${ex.name}" oninput="updCoreEx(${s.id},${ex.id},'name',this.value)">
+              <input class="core-ex-name" type="text" list="coreExOptions" data-cn="${ex.id}" placeholder="exercise name" value="${ex.name}" oninput="updCoreEx(${s.id},${ex.id},'name',this.value)">
               <button class="core-ex-remove" onclick="removeCoreEx(${s.id},${ex.id})">×</button>
             </div>
             <div style="margin-left:13px;">
@@ -898,7 +867,6 @@
           msg+=`  ${ei+1}. ${ex.name}`;
           if(ex.duration) msg+=` — ${ex.duration}s`;
           msg+='\n';
-          if(ex.restAfter) msg+=`  ⏱ rest: ${ex.restAfter}\n`;
         });
       });
     }
@@ -982,7 +950,7 @@
   function saveTemplates(arr) { localStorage.setItem('gymlog_templates',JSON.stringify(arr)); }
   function addTemplate() {
     const arr=loadTemplates(), id=Date.now();
-    arr.push({id,name:'',mainExs:[{name:''}],cardioExs:[{name:'',duration:''}],coreSets:[{exercises:[{name:'',duration:'',restAfter:'5s'}]}]});
+    arr.push({id,name:'',mainExs:[{name:''}],cardioExs:[{name:'',duration:''}],coreSets:[{exercises:[{name:'',duration:''}]}]});
     saveTemplates(arr); renderTemplates();
   }
   function deleteTemplate(id) { saveTemplates(loadTemplates().filter(t=>t.id!==id)); renderTemplates(); }
@@ -992,10 +960,10 @@
     mains=[]; cardios=[]; cores=[]; uid=0;
     t.mainExs.forEach(ex=>{const eid=++uid;mains.push({id:eid,name:ex.name,sets:[{reps:'',weight:'',diff:''}],notes:''}); });
     t.cardioExs.forEach(ex=>{const eid=++uid;cardios.push({id:eid,type:ex.name,duration:ex.duration,notes:''});});
-    t.coreSets.forEach(cs=>{const setId=++uid;const exercises=cs.exercises.map(ex=>({id:++uid,name:ex.name,duration:ex.duration,restAfter:ex.restAfter||'5s'}));cores.push({id:setId,exercises});});
+    t.coreSets.forEach(cs=>{const setId=++uid;const exercises=cs.exercises.map(ex=>({id:++uid,name:ex.name,duration:ex.duration}));cores.push({id:setId,exercises});});
     if(!mains.length){const id=++uid;mains.push({id,name:'',sets:[{reps:'',weight:'',diff:''}],notes:''});}
     if(!cardios.length){const id=++uid;cardios.push({id,type:'',duration:'',notes:''});}
-    if(!cores.length){const setId=++uid,ex1=++uid;cores.push({id:setId,exercises:[{id:ex1,name:'',duration:'',restAfter:'5s'}]});}
+    if(!cores.length){const setId=++uid,ex1=++uid;cores.push({id:setId,exercises:[{id:ex1,name:'',duration:''}]});}
     document.getElementById('workoutName').value=t.name||'';
     renderMain(); renderCardio(); renderCore();
     switchPage('logger'); showToast('Template loaded','ok');
@@ -1010,17 +978,16 @@
       let cardioRows=t.cardioExs.map((ex,i)=>`<div class="tpl-ex-row"><input type="text" placeholder="type" value="${ex.name}" oninput="updateTemplate(${t.id},t=>{t.cardioExs[${i}].name=this.value})"><input type="number" class="small" min="0" placeholder="min" value="${ex.duration}" onchange="updateTemplate(${t.id},t=>{t.cardioExs[${i}].duration=this.value})"><button class="tpl-remove-ex" onclick="updateTemplate(${t.id},t=>{t.cardioExs.splice(${i},1)});renderTemplates()">×</button></div>`).join('');
       let coreHTML=t.coreSets.map((cs,si)=>{
         const exRows=cs.exercises.map((ex,ei)=>{
-          const restBtns=REST_OPTIONS.map(r=>`<button class="rest-btn ${ex.restAfter===r?'active':''}" onclick="updateTemplate(${t.id},t=>{t.coreSets[${si}].exercises[${ei}].restAfter='${r}'});renderTemplates()">${r}</button>`).join('');
-          return `<div class="tpl-ex-row" style="flex-wrap:wrap;gap:4px;"><input type="text" placeholder="exercise" value="${ex.name}" style="min-width:100px;" oninput="updateTemplate(${t.id},t=>{t.coreSets[${si}].exercises[${ei}].name=this.value})"><input type="number" class="small" min="0" placeholder="sec" value="${ex.duration}" onchange="updateTemplate(${t.id},t=>{t.coreSets[${si}].exercises[${ei}].duration=this.value})"><div class="rest-presets" style="flex:none;">${restBtns}</div><button class="tpl-remove-ex" onclick="updateTemplate(${t.id},t=>{if(t.coreSets[${si}].exercises.length>1)t.coreSets[${si}].exercises.splice(${ei},1)});renderTemplates()">×</button></div>`;
+          return `<div class="tpl-ex-row" style="flex-wrap:wrap;gap:4px;"><input type="text" placeholder="exercise" value="${ex.name}" style="min-width:100px;" oninput="updateTemplate(${t.id},t=>{t.coreSets[${si}].exercises[${ei}].name=this.value})"><input type="number" class="small" min="0" placeholder="sec" value="${ex.duration}" onchange="updateTemplate(${t.id},t=>{t.coreSets[${si}].exercises[${ei}].duration=this.value})"><button class="tpl-remove-ex" onclick="updateTemplate(${t.id},t=>{if(t.coreSets[${si}].exercises.length>1)t.coreSets[${si}].exercises.splice(${ei},1)});renderTemplates()">×</button></div>`;
         }).join('');
-        return `<div style="margin-bottom:8px;"><div style="font-size:10px;font-family:var(--mono);color:var(--text-faint);text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px;">set ${si+1}</div>${exRows}${cs.exercises.length<3?`<button class="tpl-add-ex" onclick="updateTemplate(${t.id},t=>{t.coreSets[${si}].exercises.push({name:'',duration:'',restAfter:'5s'})});renderTemplates()">+ exercise</button>`:''}<button class="tpl-remove-ex" style="font-size:11px;font-family:var(--mono);margin-top:4px;" onclick="updateTemplate(${t.id},t=>{if(t.coreSets.length>0)t.coreSets.splice(${si},1)});renderTemplates()">remove set</button></div>`;
+        return `<div style="margin-bottom:8px;"><div style="font-size:10px;font-family:var(--mono);color:var(--text-faint);text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px;">set ${si+1}</div>${exRows}${cs.exercises.length<3?`<button class="tpl-add-ex" onclick="updateTemplate(${t.id},t=>{t.coreSets[${si}].exercises.push({name:'',duration:''})});renderTemplates()">+ exercise</button>`:''}<button class="tpl-remove-ex" style="font-size:11px;font-family:var(--mono);margin-top:4px;" onclick="updateTemplate(${t.id},t=>{if(t.coreSets.length>0)t.coreSets.splice(${si},1)});renderTemplates()">remove set</button></div>`;
       }).join('');
       card.innerHTML=`
         <div class="tpl-card-header"><input class="tpl-name-input" type="text" placeholder="template name" value="${t.name}" oninput="updateTemplate(${t.id},t=>{t.name=this.value})"></div>
         <div class="tpl-body">
           <div><div class="tpl-section-label">🏋️ exercises</div>${mainRows}<button class="tpl-add-ex" onclick="updateTemplate(${t.id},t=>{t.mainExs.push({name:''})});renderTemplates()">+ exercise</button></div>
           <div><div class="tpl-section-label">🏃 cardio</div>${cardioRows}<button class="tpl-add-ex" onclick="updateTemplate(${t.id},t=>{t.cardioExs.push({name:'',duration:''})});renderTemplates()">+ cardio</button></div>
-          <div><div class="tpl-section-label">🔥 core</div>${coreHTML}${t.coreSets.length<MAX_CORE_SETS?`<button class="tpl-add-ex" onclick="updateTemplate(${t.id},t=>{t.coreSets.push({exercises:[{name:'',duration:'',restAfter:'5s'}]})});renderTemplates()">+ set</button>`:''}</div>
+          <div><div class="tpl-section-label">🔥 core</div>${coreHTML}${t.coreSets.length<MAX_CORE_SETS?`<button class="tpl-add-ex" onclick="updateTemplate(${t.id},t=>{t.coreSets.push({exercises:[{name:'',duration:''}]})});renderTemplates()">+ set</button>`:''}</div>
         </div>
         <div class="tpl-footer"><button class="load-tpl-btn" onclick="loadTemplateIntoLogger(${t.id})">load into logger →</button><button class="del-tpl-btn" onclick="deleteTemplate(${t.id})">delete</button></div>`;
       list.appendChild(card);
@@ -1218,6 +1185,7 @@
       });
       localStorage.setItem('gymlog_history', JSON.stringify(merged));
       if (document.getElementById('page-history').classList.contains('active')) renderHistory();
+      renderCoreExDatalist();
     }
     // Push the fully-merged set back up too, so every device converges on the same data
     const finalLocal = loadHistory();
@@ -1247,6 +1215,28 @@
     const exists = history.find(e => e.date === dateStr && e.name === name && contentKey(e) === newContentKey);
     if (!exists) history.unshift(entry);
     saveHistory(history);
+    renderCoreExDatalist();
+  }
+
+  // Populates the core-exercise dropdown: a small baseline list plus every
+  // unique core exercise name found in History, so it grows with actual use.
+  function renderCoreExDatalist() {
+    const baseline = ['Plank','Side Plank','Mountain Climbers','Sit-ups','Crunches','Russian Twists','Leg Raises','Flutter Kicks','Bicycle Crunches','V-ups','Hollow Hold','Dead Bug','Bird Dog','Tuck Ins'];
+    const fromHistory = [];
+    loadHistory().forEach(e => {
+      (e.cores||[]).forEach(set => (set.exercises||[]).forEach(ex => {
+        if (ex.name && ex.name.trim()) fromHistory.push(ex.name.trim());
+      }));
+    });
+    const seen = new Set();
+    const all = [...baseline, ...fromHistory].filter(n => {
+      const key = n.toLowerCase();
+      if (seen.has(key)) return false;
+      seen.add(key);
+      return true;
+    }).sort((a,b)=>a.localeCompare(b));
+    const dl = document.getElementById('coreExOptions');
+    if (dl) dl.innerHTML = all.map(n=>`<option value="${n.replace(/"/g,'&quot;')}"></option>`).join('');
   }
 
   // Get ISO week number
@@ -1320,6 +1310,9 @@
   }
 
   function deleteHistoryEntry(id) {
+    const entry = loadHistory().find(e => e.id === id);
+    const label = entry ? `"${entry.name}" (${fmtDateShort(entry.date)})` : 'this workout';
+    if (!confirm(`Delete ${label}? This cannot be undone.`)) return;
     const h = loadHistory().filter(e => e.id !== id);
     saveHistory(h);
     renderHistory();
@@ -1330,6 +1323,7 @@
     localStorage.removeItem('gymlog_history');
     cancelCompare();
     renderHistory();
+    renderCoreExDatalist();
   }
 
   function exportHistory() {
@@ -1402,6 +1396,7 @@
 
       saveHistory(merged);
       renderHistory();
+      renderCoreExDatalist();
 
       const msg = skipped
         ? `imported ${newOnes.length} workout${newOnes.length===1?'':'s'} (${skipped} already existed)`
@@ -1533,11 +1528,8 @@
           return;
         }
         const exMatch = t.match(/^\d+\.\s*([^—]+?)(?:\s*—\s*(\d+)s)?\s*$/);
-        const restMatch = t.match(/⏱\s*rest:\s*(.+)$/i);
         if (exMatch && currentSet) {
-          currentSet.exercises.push({ id: ++uid, name: exMatch[1].trim(), duration: exMatch[2] || '', restAfter: '' });
-        } else if (restMatch && currentSet && currentSet.exercises.length) {
-          currentSet.exercises[currentSet.exercises.length - 1].restAfter = restMatch[1].trim();
+          currentSet.exercises.push({ id: ++uid, name: exMatch[1].trim(), duration: exMatch[2] || '' });
         }
       });
     }
@@ -1611,6 +1603,7 @@
     });
     saveHistory(merged);
     renderHistory();
+    renderCoreExDatalist();
     closeRecoverModal();
     showToast(`recovered ${newOnes.length} workout${newOnes.length===1?'':'s'}`, 'ok');
   }
