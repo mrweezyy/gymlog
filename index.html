@@ -28,7 +28,7 @@
       --accent: #c084fc; --accent-fg: #100d1a; --green: #34d399; --red: #f87171;
       --bg-card: #1a1528;
     }
-    body { font-family: var(--sans); color: var(--text); min-height: 100vh; padding: 0 0 4rem; transition: background 0.5s, color 0.2s; background: linear-gradient(155deg,#ffffff 0%,#c8c8c8 50%,#989898 100%); background-attachment: fixed; }
+    body { font-family: var(--sans); color: var(--text); min-height: 100vh; padding: 0 0 4rem; transition: background 0.5s, color 0.2s; background: linear-gradient(155deg,#ffffff 0%,#f1efe9 55%,#e6e3da 100%); background-attachment: fixed; }
     [data-theme="dark"] body { background: linear-gradient(155deg,#3a3a36 0%,#1a1a18 50%,#000000 100%); background-attachment: fixed; }
     [data-theme="purple"] body { background: linear-gradient(160deg, #2a1a4a 0%, #1a1030 30%, #0e0e14 65%, #141418 100%); background-attachment: fixed; }
     .app { max-width: 580px; margin: 0 auto; padding: 0 1rem; }
@@ -36,12 +36,12 @@
     /* NAVBAR */
     .navbar { position: sticky; top: 0; z-index: 100; backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); background: rgba(247,246,243,0.82); border-bottom: 1px solid var(--border); margin-bottom: 1.5rem; }
     [data-theme="dark"] .navbar { background: rgba(22,22,20,0.92); }
-    [data-theme="purple"] .navbar { background: rgba(14,11,24,0.93); border-bottom-color: #4a3870; }
+    [data-theme="purple"] .navbar { background: rgba(14,11,24,0.93); border-bottom-color: var(--border); }
     [data-theme="purple"] .send-btn { background: #ffffff; color: #100d1a; font-weight: 600; box-shadow: 0 0 18px rgba(192,132,252,0.25); }
-    [data-theme="purple"] .add-set-btn { border-color: rgba(192,132,252,0.4); color: #c084fc; }
-    [data-theme="purple"] input[type=text], [data-theme="purple"] input[type=number], [data-theme="purple"] textarea { background: rgba(255,255,255,0.04); border-color: #3a3060; }
+    [data-theme="purple"] .add-set-btn { border-color: rgba(192,132,252,0.6); color: #c084fc; }
+    [data-theme="purple"] input[type=text], [data-theme="purple"] input[type=number], [data-theme="purple"] textarea { background: rgba(255,255,255,0.04); border-color: var(--border); }
     [data-theme="purple"] input[type=text]:focus, [data-theme="purple"] input[type=number]:focus, [data-theme="purple"] textarea:focus { border-color: #8b5cf6; background: rgba(255,255,255,0.07); }
-    [data-theme="purple"] .ex-card, [data-theme="purple"] .hist-card, [data-theme="purple"] .cmp-ex-block { background: rgba(255,255,255,0.04); border-color: #3a3060; }
+    [data-theme="purple"] .ex-card, [data-theme="purple"] .hist-card, [data-theme="purple"] .cmp-ex-block { background: rgba(255,255,255,0.04); border-color: var(--border); }
     [data-theme="purple"] .cfg-save { background: #c084fc; color: #100d1a; border-color: #c084fc; }
     [data-theme="purple"] .hist-mode-btn.active { background: #c084fc; color: #100d1a; border-color: #c084fc; }
     [data-theme="purple"] .clear-btn { border-color: var(--border-strong); color: var(--text-muted); }
@@ -188,7 +188,7 @@
     .send-btn { flex: 1; padding: 13px; font-size: 15px; font-weight: 500; font-family: var(--sans); background: var(--accent); color: var(--accent-fg); border: none; border-radius: var(--radius-lg); cursor: pointer; transition: opacity 0.15s; }
     .send-btn:hover { opacity: 0.85; }
     .send-btn:disabled { opacity: 0.35; cursor: not-allowed; }
-    .clear-btn { padding: 13px 18px; font-size: 13px; font-family: var(--mono); color: var(--text-muted); background: none; border: 1px solid var(--border-strong); border-radius: var(--radius-lg); cursor: pointer; }
+    .clear-btn { padding: 13px 18px; font-size: 13px; font-family: var(--mono); color: var(--text-muted); background: var(--surface); border: 1px solid var(--border-strong); border-radius: var(--radius-lg); cursor: pointer; box-shadow: 0 1px 3px rgba(0,0,0,0.06); }
     .clear-btn:hover { background: var(--surface); color: var(--text); }
 
     /* CONFIRM MODAL */
@@ -267,6 +267,17 @@
     .toast.err { background: var(--red); color: #fff; }
     /* HISTORY PAGE */
     .history-toolbar { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; flex-wrap: wrap; gap: 8px; }
+
+    /* BIG 3 */
+    .big3-widget { display: flex; justify-content: space-around; gap: 8px; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 16px 8px; margin-bottom: 1.25rem; }
+    .big3-item { display: flex; flex-direction: column; align-items: center; gap: 3px; flex: 1; min-width: 0; }
+    .big3-ring-wrap { position: relative; width: 62px; height: 62px; }
+    .big3-ring-svg { width: 100%; height: 100%; }
+    .big3-ring-svg circle.big3-ring-progress { transition: stroke-dashoffset 0.6s ease; }
+    .big3-ring-label { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-family: var(--mono); font-size: 12px; font-weight: 600; color: var(--text); }
+    .big3-name { font-family: var(--mono); font-size: 11px; text-transform: uppercase; letter-spacing: .06em; color: var(--text-muted); margin-top: 2px; }
+    .big3-detail { font-size: 10px; color: var(--text-faint); font-family: var(--mono); text-align: center; }
+    .big3-empty { text-align: center; font-size: 12px; font-family: var(--mono); color: var(--text-faint); padding: 0.5rem 0; width: 100%; }
     .hist-toolbar-actions { display: flex; align-items: center; gap: 12px; }
     .hist-mode-btns { display: flex; gap: 6px; }
     .hist-mode-btn { font-size: 12px; font-family: var(--mono); padding: 5px 14px; border-radius: 20px; border: 1px solid var(--border); background: none; color: var(--text-muted); cursor: pointer; transition: all 0.15s; }
@@ -313,7 +324,7 @@
 <!-- NAVBAR -->
 <div class="navbar">
   <div class="navbar-inner">
-    <div class="logo">gym_log <span style="font-size:10px;color:var(--text-faint);font-weight:400;">v3.4</span></div>
+    <div class="logo">gym_log <span style="font-size:10px;color:var(--text-faint);font-weight:400;">v3.5</span></div>
     <div class="navbar-right">
       <button class="theme-toggle" onclick="toggleTheme()" title="toggle theme"></button>
       <button class="hamburger" onclick="openMenu()"><span></span><span></span><span></span></button>
@@ -455,6 +466,7 @@
   </div>
 
   <div class="page" id="page-history">
+    <div class="big3-widget" id="big3Widget"></div>
     <div class="history-toolbar">
       <div class="hist-mode-btns">
         <button class="hist-mode-btn active" id="hm-workouts" onclick="setHistMode('workouts')">workouts</button>
@@ -611,7 +623,7 @@
       const el=document.getElementById('mi-'+n);
       if(el) el.classList.toggle('active', n===id);
     });
-    if (id==='history') renderHistory();
+    if (id==='history') { renderHistory(); renderBig3(); }
   }
 
   /* COLLAPSIBLE SECTIONS */
@@ -802,47 +814,72 @@
 
   /* MESSAGE */
   const diffEmoji={easy:'🟢',sweet:'🟡',fail:'🔴'}, diffText={easy:'easy',sweet:'sweet spot',fail:'failure'};
+
+  // Escapes MarkdownV2 reserved characters in dynamic (user-typed) content.
+  // Static formatting characters we add ourselves (*, >, |, the literal
+  // "\\." on numbering) are written directly and must NOT go through this.
+  function mdEsc(v) {
+    return String(v).replace(/[_*\[\]()~`>#+\-=|{}.!\\]/g, '\\$&');
+  }
+
+  // Wraps a set of already-formatted lines into a single MarkdownV2
+  // expandable blockquote: collapsed to its first line by default, with
+  // a "Show more" the reader taps to reveal the rest.
+  function toExpandableQuote(lines) {
+    if (!lines.length) return '';
+    const quoted = lines.map(l => '>' + l);
+    quoted[0] = '**' + quoted[0];
+    quoted[quoted.length - 1] = quoted[quoted.length - 1] + '**||';
+    return quoted.join('\n');
+  }
+
   function buildMessage() {
     const d=getLogDate().toLocaleDateString(undefined,{weekday:'long',year:'numeric',month:'long',day:'numeric'});
     const name=document.getElementById('workoutName').value.trim();
     const sn=document.getElementById('sessionNotes').value.trim();
     const hasMain=mains.some(e=>e.name.trim()), hasCardio=cardios.some(e=>e.type||e.duration), hasCore=cores.some(s=>s.exercises.some(e=>e.name.trim()));
     if(!hasMain&&!hasCardio&&!hasCore) return null;
-    let msg=`💪 *${name||'Workout'}*\n📅 ${d}\n`;
+
+    // Header stays outside any quote — always visible without tapping.
+    let msg = `💪 *${mdEsc(name||'Workout')}*\n📅 ${mdEsc(d)}`;
+
     if(hasMain){
-      msg+=`\n*🏋️ Exercises*\n`;
+      const lines=['🏋️ *Exercises*'];
       mains.filter(e=>e.name.trim()).forEach((ex,i)=>{
-        msg+=`\n*${i+1}. ${ex.name}*\n`;
+        lines.push(`*${i+1}\\. ${mdEsc(ex.name)}*`);
         ex.sets.forEach((s,si)=>{
-          const reps=s.reps||'—',kg=s.weight?`${s.weight} kg`:'—',feel=s.diff?` ${diffEmoji[s.diff]} ${diffText[s.diff]}`:'';
-          msg+=`  Set ${si+1}: ${reps} reps × ${kg}${feel}\n`;
+          const reps=mdEsc(s.reps||'—'),kg=s.weight?`${mdEsc(s.weight)} kg`:'—',feel=s.diff?` ${diffEmoji[s.diff]} ${diffText[s.diff]}`:'';
+          lines.push(`  Set ${si+1}: ${reps} reps × ${kg}${feel}`);
         });
-        if(ex.notes.trim()) msg+=`  _${ex.notes.trim()}_\n`;
+        if(ex.notes.trim()) lines.push(`  _${mdEsc(ex.notes.trim())}_`);
       });
+      msg += '\n\n' + toExpandableQuote(lines);
     }
     if(hasCardio){
-      msg+=`\n*🏃 Cardio*\n`;
+      const lines=['🏃 *Cardio*'];
       cardios.filter(e=>e.type||e.duration).forEach((e,i)=>{
-        msg+=`\n  ${i+1}. ${e.type||'cardio'}`;
-        if(e.duration) msg+=` — ${e.duration} min`;
-        if(e.km) msg+=` — ${e.km} km`;
-        msg+='\n';
-        if(e.notes.trim()) msg+=`  _${e.notes}_\n`;
+        let line=`  ${i+1}\\. ${mdEsc(e.type||'cardio')}`;
+        if(e.duration) line+=` — ${mdEsc(e.duration)} min`;
+        if(e.km) line+=` — ${mdEsc(e.km)} km`;
+        lines.push(line);
+        if(e.notes.trim()) lines.push(`  _${mdEsc(e.notes)}_`);
       });
+      msg += '\n\n' + toExpandableQuote(lines);
     }
     if(hasCore){
-      msg+=`\n*🔥 Core*\n`;
+      const lines=['🔥 *Core*'];
       cores.forEach((s,si)=>{
         const valid=s.exercises.filter(e=>e.name.trim()); if(!valid.length) return;
-        msg+=`\n  *Set ${si+1}*\n`;
+        lines.push(`  *Set ${si+1}*`);
         valid.forEach((ex,ei)=>{
-          msg+=`  ${ei+1}. ${ex.name}`;
-          if(ex.duration) msg+=` — ${ex.duration}s`;
-          msg+='\n';
+          let line=`  ${ei+1}\\. ${mdEsc(ex.name)}`;
+          if(ex.duration) line+=` — ${mdEsc(ex.duration)}s`;
+          lines.push(line);
         });
       });
+      msg += '\n\n' + toExpandableQuote(lines);
     }
-    if(sn) msg+=`\n📝 ${sn}`;
+    if(sn) msg += `\n\n📝 ${mdEsc(sn)}`;
     return msg;
   }
 
@@ -1086,7 +1123,7 @@
         return (b.id || 0) - (a.id || 0);
       });
       localStorage.setItem('gymlog_history', JSON.stringify(merged));
-      if (document.getElementById('page-history').classList.contains('active')) renderHistory();
+      if (document.getElementById('page-history').classList.contains('active')) { renderHistory(); renderBig3(); }
       renderCoreExDatalist();
     }
     // Push the fully-merged set back up too, so every device converges on the same data
@@ -1325,8 +1362,18 @@
   }
 
   // Strips leftover markdown chars (telegram copy usually already strips these,
-  // but raw exports / manual retyping may still have them)
-  function stripMd(s) { return s.replace(/\*/g, '').trim(); }
+  // but raw exports / manual retyping may still have them). Also unescapes
+  // MarkdownV2 backslash-escapes and strips the expandable-blockquote markers
+  // (>, **, ||) in case someone pastes raw source instead of a normal copy.
+  function stripMd(s) {
+    return s
+      .replace(/\\([_*\[\]()~`>#+\-=|{}.!])/g, '$1')
+      .replace(/\|\|/g, '')
+      .replace(/\*\*/g, '')
+      .replace(/^>+\s?/, '')
+      .replace(/\*/g, '')
+      .trim();
+  }
 
   function parseTelegramDate(raw) {
     const cleaned = stripMd(raw).replace(/^📅\s*/, '').trim();
@@ -1393,8 +1440,12 @@
             weight: weightRaw === '—' ? '' : weightRaw,
             diff
           });
-        } else if (current && t && !t.startsWith('Set') && line.trim().startsWith('_')) {
-          current.notes = t.replace(/^_|_$/g, '').trim();
+        } else if (current && t && !t.startsWith('Set') && !/^\d+\.\s*/.test(t)) {
+          // A plain line following a numbered exercise (not itself numbered,
+          // not a "Set N:" line) is that exercise's note. We don't rely on a
+          // leading "_" italic marker here — a normal Telegram copy strips
+          // all markdown syntax, so that marker is never actually present.
+          current.notes = t.trim();
         }
       });
       mains.forEach(m => { if (!m.sets.length) m.sets.push({ reps: '', weight: '', diff: '' }); });
@@ -1411,8 +1462,8 @@
         if (m) {
           current = { id: ++uid, type: m[1].trim(), duration: m[2] || '', km: m[3] || '', notes: '' };
           cardios.push(current);
-        } else if (current && line.trim().startsWith('_')) {
-          current.notes = t.replace(/^_|_$/g, '').trim();
+        } else if (current && t && !/^\d+\.\s*/.test(t)) {
+          current.notes = t.trim();
         }
       });
     }
@@ -1558,6 +1609,75 @@
   function toggleHistCard(id) {
     const body = document.getElementById('hist-body-'+id);
     if (body) body.style.display = body.style.display==='none' ? 'block' : 'none';
+  }
+
+  /* BIG 3 */
+  // Squat/bench/deadlift progress, computed straight from logged history —
+  // no manual program data needed. Each ring shows the heaviest set from
+  // the most recent session containing that lift, as a % of your all-time
+  // PR for it.
+  const BIG3_CONFIG = [
+    { key: 'squat',    label: 'squat',    match: /squat/i,    color: 'var(--red)' },
+    { key: 'bench',    label: 'bench',    match: /bench/i,    color: 'var(--accent)' },
+    { key: 'deadlift', label: 'deadlift', match: /deadlift/i, color: 'var(--green)' }
+  ];
+
+  function computeBig3() {
+    const history = loadHistory().slice().sort((a,b) => (a.date||'').localeCompare(b.date||''));
+    const stats = {};
+    BIG3_CONFIG.forEach(c => { stats[c.key] = { allTimeMax: 0, recentMax: 0 }; });
+    history.forEach(entry => {
+      (entry.mains||[]).forEach(ex => {
+        if (!ex.name) return;
+        const cfg = BIG3_CONFIG.find(c => c.match.test(ex.name));
+        if (!cfg) return;
+        let maxInEntry = 0;
+        (ex.sets||[]).forEach(s => {
+          const w = parseFloat(s.weight);
+          if (!isNaN(w) && w > maxInEntry) maxInEntry = w;
+        });
+        if (maxInEntry > 0) {
+          const st = stats[cfg.key];
+          if (maxInEntry > st.allTimeMax) st.allTimeMax = maxInEntry;
+          st.recentMax = maxInEntry; // history is date-ascending, so last write = most recent
+        }
+      });
+    });
+    return stats;
+  }
+
+  function big3RingSVG(pct, color) {
+    const r = 26, c = 2 * Math.PI * r, offset = c * (1 - pct / 100);
+    return `<svg viewBox="0 0 62 62" class="big3-ring-svg">
+      <circle cx="31" cy="31" r="${r}" fill="none" stroke="var(--border)" stroke-width="6"/>
+      <circle class="big3-ring-progress" cx="31" cy="31" r="${r}" fill="none" stroke="${color}" stroke-width="6" stroke-linecap="round" stroke-dasharray="${c}" stroke-dashoffset="${offset}" transform="rotate(-90 31 31)"/>
+    </svg>`;
+  }
+
+  function renderBig3() {
+    const el = document.getElementById('big3Widget');
+    if (!el) return;
+    const stats = computeBig3();
+    const anyData = BIG3_CONFIG.some(c => stats[c.key].allTimeMax > 0);
+    if (!anyData) {
+      el.innerHTML = `<div class="big3-empty">Log squat / bench / deadlift sets to see progress here</div>`;
+      return;
+    }
+    el.innerHTML = BIG3_CONFIG.map(c => {
+      const s = stats[c.key];
+      if (!s.allTimeMax) {
+        return `<div class="big3-item">
+          <div class="big3-ring-wrap">${big3RingSVG(0,'var(--border)')}<div class="big3-ring-label">—</div></div>
+          <div class="big3-name">${c.label}</div>
+        </div>`;
+      }
+      const pct = Math.min(100, Math.round(s.recentMax / s.allTimeMax * 100));
+      return `<div class="big3-item">
+        <div class="big3-ring-wrap">${big3RingSVG(pct,c.color)}<div class="big3-ring-label">${pct}%</div></div>
+        <div class="big3-name">${c.label}</div>
+        <div class="big3-detail">${s.recentMax}/${s.allTimeMax}kg</div>
+      </div>`;
+    }).join('');
   }
 
   function renderHistory() {
