@@ -10,20 +10,20 @@
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     :root {
-      --bg: #f7f6f3; --surface: #ffffff; --border: #d8d5ce; --border-strong: #b8b4aa;
+      --bg: #f7f6f3; --surface: #ffffff; --border: #a89f90; --border-strong: #847c66;
       --text: #0a0a08; --text-muted: #5a5750; --text-faint: #726c60;
       --accent: #0a0a08; --accent-fg: #f7f6f3; --green: #1a6647; --red: #b83232;
       --mono: 'DM Mono', monospace; --sans: 'DM Sans', sans-serif;
       --radius: 10px; --radius-lg: 14px;
     }
     [data-theme="dark"] {
-      --bg: #0e0e0d; --surface: #1c1c1a; --border: #4a4a44; --border-strong: #707068;
+      --bg: #0e0e0d; --surface: #1c1c1a; --border: #666660; --border-strong: #85857c;
       --text: #ffffff; --text-muted: #c0bdb4; --text-faint: #888480;
       --accent: #ffffff; --accent-fg: #0e0e0d; --green: #2d9e6e; --red: #c94040;
       --bg-card: #1c1c1a;
     }
     [data-theme="purple"] {
-      --bg: #100d1a; --surface: #1a1528; --border: #3a3050; --border-strong: #6a58a0;
+      --bg: #100d1a; --surface: #1a1528; --border: #5c5286; --border-strong: #8874c4;
       --text: #f0ecff; --text-muted: #b8aee0; --text-faint: #8f82c4;
       --accent: #c084fc; --accent-fg: #100d1a; --green: #34d399; --red: #f87171;
       --bg-card: #1a1528;
@@ -44,7 +44,7 @@
     [data-theme="purple"] .ex-card, [data-theme="purple"] .hist-card, [data-theme="purple"] .cmp-ex-block { background: rgba(255,255,255,0.04); border-color: #3a3060; }
     [data-theme="purple"] .cfg-save { background: #c084fc; color: #100d1a; border-color: #c084fc; }
     [data-theme="purple"] .hist-mode-btn.active { background: #c084fc; color: #100d1a; border-color: #c084fc; }
-    [data-theme="purple"] .clear-btn { border-color: rgba(255,255,255,0.15); color: rgba(255,255,255,0.5); }
+    [data-theme="purple"] .clear-btn { border-color: var(--border-strong); color: var(--text-muted); }
     .navbar-inner { max-width: 580px; margin: 0 auto; padding: 0 1rem; display: flex; align-items: center; justify-content: space-between; height: 52px; }
     .logo { font-family: var(--mono); font-size: 18px; font-weight: 500; letter-spacing: -0.5px; color: var(--text); }
     .navbar-right { display: flex; align-items: center; gap: 10px; }
@@ -188,7 +188,7 @@
     .send-btn { flex: 1; padding: 13px; font-size: 15px; font-weight: 500; font-family: var(--sans); background: var(--accent); color: var(--accent-fg); border: none; border-radius: var(--radius-lg); cursor: pointer; transition: opacity 0.15s; }
     .send-btn:hover { opacity: 0.85; }
     .send-btn:disabled { opacity: 0.35; cursor: not-allowed; }
-    .clear-btn { padding: 13px 18px; font-size: 13px; font-family: var(--mono); color: var(--text-muted); background: none; border: 1px solid var(--border); border-radius: var(--radius-lg); cursor: pointer; }
+    .clear-btn { padding: 13px 18px; font-size: 13px; font-family: var(--mono); color: var(--text-muted); background: none; border: 1px solid var(--border-strong); border-radius: var(--radius-lg); cursor: pointer; }
     .clear-btn:hover { background: var(--surface); color: var(--text); }
 
     /* CONFIRM MODAL */
@@ -259,27 +259,6 @@
     .plan-notes { margin-top: 8px; font-size: 13px; }
 
     /* PERIODIZATION */
-    .prog-list { display: flex; flex-direction: column; gap: 14px; margin-bottom: 10px; }
-    .prog-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); overflow: hidden; animation: fadeIn 0.15s ease; }
-    .prog-header { display: flex; align-items: center; gap: 8px; padding: 12px 14px; border-bottom: 1px solid var(--border); background: var(--bg); }
-    .prog-name-input { flex: 1; border: none !important; border-bottom: 1px solid var(--border) !important; border-radius: 0 !important; background: transparent !important; font-size: 15px; font-weight: 500; padding: 2px 0 4px !important; }
-    .prog-name-input:focus { outline: none; border-color: var(--border-strong) !important; }
-    .prog-body { padding: 12px 14px; }
-    .prog-week { border: 1px solid var(--border); border-radius: var(--radius); margin-bottom: 10px; overflow: hidden; }
-    .prog-week-header { display: flex; align-items: center; justify-content: space-between; padding: 8px 12px; background: var(--bg); border-bottom: 1px solid var(--border); }
-    .prog-week-title { font-family: var(--mono); font-size: 12px; font-weight: 500; color: var(--text-muted); }
-    .prog-week-body { padding: 10px 12px; display: flex; flex-direction: column; gap: 8px; }
-    .prog-day-row { display: flex; align-items: center; gap: 8px; }
-    .prog-day-label { font-size: 12px; font-family: var(--mono); color: var(--text-muted); min-width: 70px; }
-    .prog-day-input { flex: 1; font-size: 12px; padding: 5px 8px; height: 28px; }
-    .prog-big3-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 6px; margin-top: 6px; }
-    .prog-big3-cell { background: var(--bg); border: 1px solid var(--border); border-radius: var(--radius); padding: 8px; }
-    .prog-big3-name { font-size: 10px; font-family: var(--mono); color: var(--text-faint); text-transform: uppercase; letter-spacing: .06em; margin-bottom: 4px; }
-    .prog-big3-input { width: 100%; font-size: 13px; font-family: var(--mono); padding: 4px 6px; height: 28px; text-align: center; }
-    .prog-add-week { font-size: 11px; font-family: var(--mono); color: var(--text-muted); background: none; border: 1px dashed var(--border); border-radius: var(--radius); padding: 5px 12px; cursor: pointer; width: 100%; margin-top: 4px; }
-    .prog-add-week:hover { border-color: var(--border-strong); color: var(--text); }
-    .prog-remove { background: none; border: none; color: var(--text-faint); font-size: 14px; cursor: pointer; }
-    .prog-remove:hover { color: var(--red); }
 
     /* TOAST */
     .toast { position: fixed; bottom: 28px; left: 50%; transform: translateX(-50%) translateY(8px); padding: 10px 22px; border-radius: 999px; font-size: 13px; font-family: var(--mono); font-weight: 500; opacity: 0; transition: opacity 0.2s, transform 0.2s; pointer-events: none; white-space: nowrap; z-index: 999; }
@@ -334,7 +313,7 @@
 <!-- NAVBAR -->
 <div class="navbar">
   <div class="navbar-inner">
-    <div class="logo">gym_log <span style="font-size:10px;color:var(--text-faint);font-weight:400;">v3.3</span></div>
+    <div class="logo">gym_log <span style="font-size:10px;color:var(--text-faint);font-weight:400;">v3.4</span></div>
     <div class="navbar-right">
       <button class="theme-toggle" onclick="toggleTheme()" title="toggle theme"></button>
       <button class="hamburger" onclick="openMenu()"><span></span><span></span><span></span></button>
@@ -355,7 +334,6 @@
     <button class="menu-item" id="mi-history"       onclick="switchPage('history');closeMenu()"><span class="menu-item-icon">📊</span>history</button>
     <button class="menu-item" id="mi-templates"      onclick="switchPage('templates');closeMenu()"><span class="menu-item-icon">⚡</span>templates</button>
     <button class="menu-item" id="mi-planner"        onclick="switchPage('planner');closeMenu()"><span class="menu-item-icon">📅</span>workout planner</button>
-    <button class="menu-item" id="mi-periodization"  onclick="switchPage('periodization');closeMenu()"><span class="menu-item-icon">📈</span>periodization</button>
   </div>
 </div>
 
@@ -474,12 +452,6 @@
   <div class="page" id="page-planner">
     <div class="plan-list" id="planList"></div>
     <button class="add-any-btn" onclick="addPlanDay()">+ add day</button>
-  </div>
-
-  <!-- PAGE: PERIODIZATION -->
-  <div class="page" id="page-periodization">
-    <div class="prog-list" id="progList"></div>
-    <button class="add-any-btn" onclick="addProgram()">+ new program</button>
   </div>
 
   <div class="page" id="page-history">
@@ -619,7 +591,7 @@
     const restored = restoreSession();
     renderDateStr();
     if (!restored) { addMain(); addCardio(); addCoreSet(); }
-    renderTemplates(); renderPlanner(); renderPeriodization();
+    renderTemplates(); renderPlanner();
     renderCoreExDatalist();
 
     initRemoteSync();
@@ -635,7 +607,7 @@
   function switchPage(id) {
     document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
     document.getElementById('page-'+id).classList.add('active');
-    ['logger','history','templates','planner','periodization'].forEach(n=>{
+    ['logger','history','templates','planner'].forEach(n=>{
       const el=document.getElementById('mi-'+n);
       if(el) el.classList.toggle('active', n===id);
     });
@@ -1081,76 +1053,6 @@
           ${exRows}
           <button class="plan-add-ex" onclick="updatePlanner(${d.id},d=>{d.exercises.push({name:'',sets:'',reps:''})});renderPlanner()">+ exercise</button>
           <textarea class="plan-notes" rows="2" placeholder="notes, tips, reminders…" onblur="updatePlanner(${d.id},d=>{d.notes=this.value})">${d.notes||''}</textarea>
-        </div>`;
-      list.appendChild(card);
-    });
-  }
-
-  /* PERIODIZATION */
-  function loadPrograms() { try { return JSON.parse(localStorage.getItem('gymlog_programs')||'[]'); } catch { return []; } }
-  function savePrograms(arr) { localStorage.setItem('gymlog_programs',JSON.stringify(arr)); }
-  function addProgram() {
-    const arr=loadPrograms(), id=Date.now();
-    arr.push({id,name:'',weeks:[{id:Date.now(),days:[{label:'Day 1',notes:''}],big3:{squat:'',bench:'',deadlift:''}}]});
-    savePrograms(arr); renderPeriodization();
-  }
-  function deleteProgram(id) { savePrograms(loadPrograms().filter(p=>p.id!==id)); renderPeriodization(); }
-  function updateProgram(id,fn) { const arr=loadPrograms(),p=arr.find(p=>p.id===id); if(p){fn(p);savePrograms(arr);} }
-  function addWeek(progId) {
-    updateProgram(progId,p=>{p.weeks.push({id:Date.now(),days:[{label:'Day 1',notes:''}],big3:{squat:'',bench:'',deadlift:''}});});
-    renderPeriodization();
-  }
-  function removeWeek(progId,wi) { updateProgram(progId,p=>{if(p.weeks.length>1)p.weeks.splice(wi,1);}); renderPeriodization(); }
-
-  function renderPeriodization() {
-    const list=document.getElementById('progList'), arr=loadPrograms();
-    list.innerHTML='';
-    if(!arr.length){list.innerHTML=`<div style="font-size:13px;color:var(--text-faint);font-family:var(--mono);text-align:center;padding:2rem 0;">no programs yet</div>`;return;}
-    arr.forEach(p=>{
-      const card=document.createElement('div'); card.className='prog-card';
-      const weeksHTML=p.weeks.map((w,wi)=>{
-        const daysHTML=w.days.map((day,di)=>`
-          <div class="prog-day-row">
-            <input type="text" class="prog-day-input" placeholder="e.g. Chest & Triceps" value="${day.label||''}" style="max-width:120px;flex:none;" onblur="updateProgram(${p.id},p=>{p.weeks[${wi}].days[${di}].label=this.value})">
-            <input type="text" class="prog-day-input" placeholder="exercises / notes" value="${day.notes||''}" onblur="updateProgram(${p.id},p=>{p.weeks[${wi}].days[${di}].notes=this.value})">
-            <button class="prog-remove" onclick="updateProgram(${p.id},p=>{if(p.weeks[${wi}].days.length>1)p.weeks[${wi}].days.splice(${di},1)});renderPeriodization()">×</button>
-          </div>`).join('');
-        const big3=w.big3||{squat:'',bench:'',deadlift:''};
-        return `<div class="prog-week">
-          <div class="prog-week-header">
-            <span class="prog-week-title">week ${wi+1}</span>
-            <button class="prog-remove" onclick="removeWeek(${p.id},${wi})">×</button>
-          </div>
-          <div class="prog-week-body">
-            <div style="font-size:10px;font-family:var(--mono);color:var(--text-faint);text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px;">workout days</div>
-            ${daysHTML}
-            <button style="font-size:11px;font-family:var(--mono);color:var(--text-muted);background:none;border:1px dashed var(--border);border-radius:5px;padding:3px 8px;cursor:pointer;margin-top:2px;" onclick="updateProgram(${p.id},p=>{p.weeks[${wi}].days.push({label:'',notes:''})});renderPeriodization()">+ day</button>
-            <div style="font-size:10px;font-family:var(--mono);color:var(--text-faint);text-transform:uppercase;letter-spacing:.06em;margin:10px 0 4px;">big 3 intensity</div>
-            <div class="prog-big3-grid">
-              <div class="prog-big3-cell">
-                <div class="prog-big3-name">squat</div>
-                <input class="prog-big3-input" type="text" placeholder="e.g. 75%" value="${big3.squat||''}" onblur="updateProgram(${p.id},p=>{if(!p.weeks[${wi}].big3)p.weeks[${wi}].big3={};p.weeks[${wi}].big3.squat=this.value})">
-              </div>
-              <div class="prog-big3-cell">
-                <div class="prog-big3-name">bench</div>
-                <input class="prog-big3-input" type="text" placeholder="e.g. 75%" value="${big3.bench||''}" onblur="updateProgram(${p.id},p=>{if(!p.weeks[${wi}].big3)p.weeks[${wi}].big3={};p.weeks[${wi}].big3.bench=this.value})">
-              </div>
-              <div class="prog-big3-cell">
-                <div class="prog-big3-name">deadlift</div>
-                <input class="prog-big3-input" type="text" placeholder="e.g. 75%" value="${big3.deadlift||''}" onblur="updateProgram(${p.id},p=>{if(!p.weeks[${wi}].big3)p.weeks[${wi}].big3={};p.weeks[${wi}].big3.deadlift=this.value})">
-              </div>
-            </div>
-          </div>
-        </div>`;
-      }).join('');
-      card.innerHTML=`
-        <div class="prog-header">
-          <input class="prog-name-input" type="text" placeholder="program name (e.g. 4 Week Powerbuilder)" value="${p.name}" onblur="updateProgram(${p.id},p=>{p.name=this.value})">
-          <button class="icon-btn" style="font-size:15px;" onclick="deleteProgram(${p.id})">×</button>
-        </div>
-        <div class="prog-body">
-          ${weeksHTML}
-          <button class="prog-add-week" onclick="addWeek(${p.id})">+ add week</button>
         </div>`;
       list.appendChild(card);
     });
