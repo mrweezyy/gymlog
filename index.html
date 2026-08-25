@@ -272,13 +272,17 @@
     .history-toolbar { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; flex-wrap: wrap; gap: 8px; }
 
     /* BIG 3 */
-    .big3-widget { display: flex; justify-content: space-around; gap: 8px; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 16px 8px; margin-bottom: 1.25rem; }
-    .big3-item { display: flex; flex-direction: column; align-items: center; gap: 3px; flex: 1; min-width: 0; }
-    .big3-ring-wrap { position: relative; width: 62px; height: 62px; }
-    .big3-ring-svg { width: 100%; height: 100%; }
-    .big3-ring-svg circle.big3-ring-progress { transition: stroke-dashoffset 0.6s ease; }
-    .big3-ring-label { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-family: var(--mono); font-size: 12px; font-weight: 600; color: var(--text); }
-    .big3-name { font-family: var(--mono); font-size: 11px; text-transform: uppercase; letter-spacing: .06em; color: var(--text-muted); margin-top: 2px; }
+    .big3-widget { display: flex; gap: 8px; margin-bottom: 1.25rem; }
+    .big3-item { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; background: var(--surface); border: 1px solid var(--border); border-left-width: 3px; border-radius: var(--radius-lg); padding: 12px 12px 11px; }
+    .big3-name { font-family: var(--mono); font-size: 10px; text-transform: uppercase; letter-spacing: .06em; color: var(--text-muted); }
+    .big3-pr-val { font-family: var(--mono); font-size: 21px; font-weight: 500; color: var(--text); line-height: 1.2; margin-top: 2px; }
+    .big3-unit { font-size: 12px; font-weight: 400; color: var(--text-faint); margin-left: 1px; }
+    .big3-reps { font-size: 12px; font-weight: 400; color: var(--text-faint); }
+    .big3-pr-date { font-size: 10px; font-family: var(--mono); color: var(--text-faint); margin-bottom: 5px; }
+    .big3-recent { font-size: 11px; color: var(--text-muted); display: flex; align-items: center; gap: 5px; flex-wrap: wrap; }
+    .big3-badge-pr { font-size: 9px; font-family: var(--mono); text-transform: uppercase; letter-spacing: .04em; color: var(--green); border: 1px solid var(--green); border-radius: 999px; padding: 1px 6px; }
+    .big3-gap { font-size: 10px; font-family: var(--mono); color: var(--text-faint); }
+    .big3-empty-mini { font-size: 11px; color: var(--text-faint); margin-top: 4px; }
     .big3-detail { font-size: 10px; color: var(--text-faint); font-family: var(--mono); text-align: center; }
     .big3-empty { text-align: center; font-size: 12px; font-family: var(--mono); color: var(--text-faint); padding: 0.5rem 0; width: 100%; }
     .hist-toolbar-actions { display: flex; align-items: center; gap: 12px; }
@@ -327,7 +331,7 @@
 <!-- NAVBAR -->
 <div class="navbar">
   <div class="navbar-inner">
-    <div class="logo">gym_log <span style="font-size:10px;color:var(--text-faint);font-weight:400;">v3.6</span></div>
+    <div class="logo">gym_log <span style="font-size:10px;color:var(--text-faint);font-weight:400;">v3.7</span></div>
     <div class="navbar-right">
       <button class="theme-toggle" onclick="toggleTheme()" title="toggle theme"></button>
       <button class="hamburger" onclick="openMenu()"><span></span><span></span><span></span></button>
@@ -509,7 +513,7 @@
     { key:'back',      label:'back',      color:'#3b82f6', keywords:['deadlift','row','pulldown','pull-up','pullup','chin-up','chinup','lat pull','shrug','back extension'] },
     { key:'legs',      label:'legs',      color:'#0d9488', keywords:['squat','leg press','leg curl','leg extension','lunge','calf','hamstring','quad','glute','hip thrust','rdl','romanian deadlift'] },
     { key:'arms',      label:'arms',      color:'#d946ef', keywords:['curl','tricep','bicep','pushdown','skull crusher','extension'] },
-    { key:'chest',     label:'chest',     color:'#e0575a', keywords:['bench','chest','fly','flye','dip','push-up','pushup','press'] },
+    { key:'chest',     label:'chest',     color:'#e0575a', keywords:['bench','chest','fly','flye','flies','flyes','dip','push-up','pushup','press'] },
     { key:'core',      label:'core',      color:'#64748b', keywords:['ab ','abs','core','crunch','plank','sit-up','situp','russian twist'] },
   ];
   function detectMuscleGroup(name) {
@@ -1656,70 +1660,67 @@
   }
 
   /* BIG 3 */
-  // Squat/bench/deadlift progress, computed straight from logged history —
-  // no manual program data needed. Each ring shows the heaviest set from
-  // the most recent session containing that lift, as a % of your all-time
-  // PR for it.
+  // Squat/bench/deadlift PRs, computed straight from logged history —
+  // no manual program data needed. Tracks your all-time PR (heaviest set
+  // ever logged) and your most recent session's top set for each lift.
   const BIG3_CONFIG = [
-    { key: 'squat',    label: 'squat',    match: /squat/i,    color: 'var(--red)' },
-    { key: 'bench',    label: 'bench',    match: /bench/i,    color: 'var(--accent)' },
-    { key: 'deadlift', label: 'deadlift', match: /deadlift/i, color: 'var(--green)' }
+    { key: 'squat',    label: 'squat',    match: /squat/i,    color: '#0d9488' },
+    { key: 'bench',    label: 'bench',    match: /bench/i,    color: '#e0575a' },
+    { key: 'deadlift', label: 'deadlift', match: /deadlift/i, color: '#3b82f6' }
   ];
 
   function computeBig3() {
     const history = loadHistory().slice().sort((a,b) => (a.date||'').localeCompare(b.date||''));
     const stats = {};
-    BIG3_CONFIG.forEach(c => { stats[c.key] = { allTimeMax: 0, recentMax: 0 }; });
+    BIG3_CONFIG.forEach(c => { stats[c.key] = { pr: null, recent: null }; });
     history.forEach(entry => {
       (entry.mains||[]).forEach(ex => {
         if (!ex.name) return;
         const cfg = BIG3_CONFIG.find(c => c.match.test(ex.name));
         if (!cfg) return;
-        let maxInEntry = 0;
+        let best = null;
         (ex.sets||[]).forEach(s => {
           const w = parseFloat(s.weight);
-          if (!isNaN(w) && w > maxInEntry) maxInEntry = w;
+          if (isNaN(w) || w <= 0) return;
+          if (!best || w > best.weight) best = { weight: w, reps: s.reps || '' };
         });
-        if (maxInEntry > 0) {
+        if (best) {
           const st = stats[cfg.key];
-          if (maxInEntry > st.allTimeMax) st.allTimeMax = maxInEntry;
-          st.recentMax = maxInEntry; // history is date-ascending, so last write = most recent
+          if (!st.pr || best.weight > st.pr.weight) st.pr = { weight: best.weight, reps: best.reps, date: entry.date };
+          st.recent = { weight: best.weight, reps: best.reps, date: entry.date }; // ascending order, so last write wins
         }
       });
     });
     return stats;
   }
 
-  function big3RingSVG(pct, color) {
-    const r = 26, c = 2 * Math.PI * r, offset = c * (1 - pct / 100);
-    return `<svg viewBox="0 0 62 62" class="big3-ring-svg">
-      <circle cx="31" cy="31" r="${r}" fill="none" stroke="var(--border)" stroke-width="6"/>
-      <circle class="big3-ring-progress" cx="31" cy="31" r="${r}" fill="none" stroke="${color}" stroke-width="6" stroke-linecap="round" stroke-dasharray="${c}" stroke-dashoffset="${offset}" transform="rotate(-90 31 31)"/>
-    </svg>`;
-  }
-
   function renderBig3() {
     const el = document.getElementById('big3Widget');
     if (!el) return;
     const stats = computeBig3();
-    const anyData = BIG3_CONFIG.some(c => stats[c.key].allTimeMax > 0);
+    const anyData = BIG3_CONFIG.some(c => stats[c.key].pr);
     if (!anyData) {
       el.innerHTML = `<div class="big3-empty">Log squat / bench / deadlift sets to see progress here</div>`;
       return;
     }
     el.innerHTML = BIG3_CONFIG.map(c => {
       const s = stats[c.key];
-      if (!s.allTimeMax) {
-        return `<div class="big3-item">
-          <div class="big3-ring-wrap">${big3RingSVG(0,'var(--border)')}<div class="big3-ring-label">—</div></div>
+      if (!s.pr) {
+        return `<div class="big3-item" style="border-left-color:var(--border)">
           <div class="big3-name">${c.label}</div>
+          <div class="big3-empty-mini">no data yet</div>
         </div>`;
       }
-      const pct = Math.min(100, Math.round(s.recentMax / s.allTimeMax * 100));
-      return `<div class="big3-item">
-        <div class="big3-ring-wrap">${big3RingSVG(pct,c.color)}<div class="big3-ring-label">${pct}%</div></div>
+      const atPR = s.recent.weight >= s.pr.weight;
+      const gap = Math.round((s.pr.weight - s.recent.weight) * 10) / 10;
+      const trend = atPR
+        ? `<span class="big3-badge-pr">at PR</span>`
+        : `<span class="big3-gap">${gap}kg off PR</span>`;
+      return `<div class="big3-item" style="border-left-color:${c.color}">
         <div class="big3-name">${c.label}</div>
-        <div class="big3-detail">${s.recentMax}/${s.allTimeMax}kg</div>
+        <div class="big3-pr-val">${s.pr.weight}<span class="big3-unit">kg</span>${s.pr.reps?` <span class="big3-reps">×${s.pr.reps}</span>`:''}</div>
+        <div class="big3-pr-date">PR · ${fmtDateShort(s.pr.date)}</div>
+        <div class="big3-recent">last ${s.recent.weight}kg${s.recent.reps?`×${s.recent.reps}`:''} ${trend}</div>
       </div>`;
     }).join('');
   }
