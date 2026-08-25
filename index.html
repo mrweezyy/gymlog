@@ -128,7 +128,10 @@
 
     /* MAIN EXERCISES */
     .ex-list { display: flex; flex-direction: column; gap: 10px; margin-bottom: 10px; }
-    .ex-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 14px 16px; animation: fadeIn 0.15s ease; }
+    .ex-card { background: var(--surface); border: 1px solid var(--border); border-left-width: 3px; border-radius: var(--radius-lg); padding: 14px 16px; animation: fadeIn 0.15s ease; transition: border-left-color 0.15s; }
+    .mg-dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; background: var(--text-faint); }
+    .mg-legend { display: flex; flex-wrap: wrap; gap: 10px; margin: -4px 0 10px; }
+    .mg-legend-item { display: flex; align-items: center; gap: 5px; font-size: 10px; font-family: var(--mono); text-transform: uppercase; letter-spacing: 0.04em; color: var(--text-faint); }
     .ex-top { display: flex; align-items: center; gap: 8px; margin-bottom: 12px; }
     .ex-index { font-family: var(--mono); font-size: 11px; color: var(--text-faint); min-width: 16px; }
     .ex-name { flex: 1; border: none !important; border-bottom: 1px solid var(--border) !important; border-radius: 0 !important; background: transparent !important; font-size: 15px; font-weight: 500; padding: 2px 0 5px !important; }
@@ -297,7 +300,7 @@
     .hist-del-btn { font-size: 14px; color: var(--text-faint); background: none; border: none; cursor: pointer; padding: 0 2px; }
     .hist-card-body { padding: 0 14px 12px; border-top: 1px solid var(--border); }
     .hist-ex { margin-top: 8px; }
-    .hist-ex-name { font-size: 12px; font-weight: 500; color: var(--text); margin-bottom: 3px; }
+    .hist-ex-name { font-size: 12px; font-weight: 500; color: var(--text); margin-bottom: 3px; display: flex; align-items: center; gap: 6px; }
     .hist-set-row { font-size: 11px; font-family: var(--mono); color: var(--text-muted); padding: 1px 0; }
     .hist-week-label { font-size: 11px; font-family: var(--mono); color: var(--text-faint); padding: 6px 0 2px; border-bottom: 1px solid var(--border); margin-bottom: 6px; }
     /* COMPARE VIEW */
@@ -306,7 +309,7 @@
     .cmp-col-label { flex: 1; font-size: 11px; font-family: var(--mono); color: var(--accent); font-weight: 600; text-align: center; background: var(--bg-card); border-radius: 8px; padding: 6px; border: 1px solid var(--border); }
     .cmp-back-btn { font-size: 12px; font-family: var(--mono); background: none; border: 1px solid var(--border); border-radius: 8px; padding: 5px 12px; cursor: pointer; color: var(--text-muted); margin-bottom: 10px; }
     .cmp-ex-block { background: var(--bg-card); border: 1px solid var(--border); border-radius: 10px; padding: 10px 14px; }
-    .cmp-ex-name { font-size: 12px; font-weight: 600; color: var(--text); margin-bottom: 6px; }
+    .cmp-ex-name { font-size: 12px; font-weight: 600; color: var(--text); margin-bottom: 6px; display: flex; align-items: center; gap: 6px; }
     .cmp-set-row { display: grid; grid-template-columns: 1fr 1fr 20px; gap: 4px; font-size: 11px; font-family: var(--mono); padding: 2px 0; border-bottom: 1px solid var(--border); }
     .cmp-set-row:last-child { border-bottom: none; }
     .cmp-set-a { color: var(--text-muted); }
@@ -421,6 +424,7 @@
       <span class="section-chevron" id="chev-exercises">▾</span>
     </div>
     <div class="section-body" id="sec-exercises">
+      <div class="mg-legend" id="mgLegendLog"></div>
       <div class="ex-list" id="mainList"></div>
       <button class="add-any-btn" onclick="addMain()">+ add exercise</button>
     </div>
@@ -484,6 +488,7 @@
       <span id="histCompareLabel">select a second item to compare</span>
       <button onclick="cancelCompare()">cancel</button>
     </div>
+    <div class="mg-legend" id="mgLegendHist"></div>
     <div id="histList" class="hist-list"></div>
     <div id="histCompareView" class="hist-compare-view" style="display:none;"></div>
   </div>
@@ -495,6 +500,30 @@
   const RELAY_URL = 'https://gymlog-relay.mrweezy.workers.dev';
   const MAX_CORE_SETS = 3;
   const BIG3 = ['squat','bench press','deadlift'];
+
+  /* MUSCLE GROUP AUTO-DETECT — checked in order, first match wins.
+     Order matters: more specific phrases (e.g. "overhead press") must be
+     checked before generic ones (e.g. "press" -> chest) to avoid misfires. */
+  const MUSCLE_GROUPS = [
+    { key:'shoulders', label:'shoulders', color:'#f59e0b', keywords:['overhead press','shoulder press','military press','arnold press','lateral raise','front raise','rear delt','delt','shoulder'] },
+    { key:'back',      label:'back',      color:'#3b82f6', keywords:['deadlift','row','pulldown','pull-up','pullup','chin-up','chinup','lat pull','shrug','back extension'] },
+    { key:'legs',      label:'legs',      color:'#0d9488', keywords:['squat','leg press','leg curl','leg extension','lunge','calf','hamstring','quad','glute','hip thrust','rdl','romanian deadlift'] },
+    { key:'arms',      label:'arms',      color:'#d946ef', keywords:['curl','tricep','bicep','pushdown','skull crusher','extension'] },
+    { key:'chest',     label:'chest',     color:'#e0575a', keywords:['bench','chest','fly','flye','dip','push-up','pushup','press'] },
+    { key:'core',      label:'core',      color:'#64748b', keywords:['ab ','abs','core','crunch','plank','sit-up','situp','russian twist'] },
+  ];
+  function detectMuscleGroup(name) {
+    const n = ' ' + (name||'').toLowerCase().trim() + ' ';
+    if (n.trim() === '') return null;
+    for (const g of MUSCLE_GROUPS) { if (g.keywords.some(k => n.includes(k))) return g; }
+    return { key:'other', label:'other', color:'var(--text-faint)' };
+  }
+  function renderMGLegend(containerId) {
+    const el = document.getElementById(containerId); if (!el) return;
+    el.innerHTML = MUSCLE_GROUPS.map(g =>
+      `<span class="mg-legend-item"><span class="mg-dot" style="background:${g.color}"></span>${g.label}</span>`
+    ).join('') + `<span class="mg-legend-item"><span class="mg-dot"></span>other</span>`;
+  }
 
   let mains=[], cardios=[], cores=[], uid=0;
   let sectionState = { exercises: true, cardio: true, core: true };
@@ -605,6 +634,7 @@
     if (!restored) { addMain(); addCardio(); addCoreSet(); }
     renderTemplates(); renderPlanner();
     renderCoreExDatalist();
+    renderMGLegend('mgLegendLog');
 
     initRemoteSync();
 
@@ -623,7 +653,7 @@
       const el=document.getElementById('mi-'+n);
       if(el) el.classList.toggle('active', n===id);
     });
-    if (id==='history') { renderHistory(); renderBig3(); }
+    if (id==='history') { renderHistory(); renderBig3(); renderMGLegend('mgLegendHist'); }
   }
 
   /* COLLAPSIBLE SECTIONS */
@@ -685,7 +715,17 @@
   function removeMain(id) { mains=mains.filter(e=>e.id!==id); renderMain(); saveSession(); }
   function addMainSet(id) { const e=mains.find(e=>e.id===id); if(e){e.sets.push({reps:'',weight:'',diff:''});renderMain();saveSession();} }
   function removeMainSet(id,i) { const e=mains.find(e=>e.id===id); if(e&&e.sets.length>1){e.sets.splice(i,1);renderMain();saveSession();} }
-  function updMain(id,f,v) { const e=mains.find(e=>e.id===id); if(e) { e[f]=v; saveSession(); } }
+  function updMain(id,f,v) {
+    const e=mains.find(e=>e.id===id); if(!e) return;
+    e[f]=v; saveSession();
+    if (f==='name') {
+      const mg = detectMuscleGroup(v);
+      const dot = document.getElementById(`mg-dot-${id}`);
+      const card = document.querySelector(`.ex-card[data-ex-id="${id}"]`);
+      if (dot) { dot.style.background = mg?mg.color:'var(--text-faint)'; dot.title = mg?mg.label:'other'; }
+      if (card) card.style.borderLeftColor = mg?mg.color:'var(--border)';
+    }
+  }
   function updMainSet(id,i,f,v) { const e=mains.find(e=>e.id===id); if(e&&e.sets[i]) { e.sets[i][f]=v; saveSession(); } }
   function setDiff(id,i,v) {
     const e=mains.find(e=>e.id===id); if(!e) return;
@@ -705,6 +745,8 @@
     const list=document.getElementById('mainList'); list.innerHTML='';
     mains.forEach((ex,mi)=>{
       const card=document.createElement('div'); card.className='ex-card'; card.dataset.exId=ex.id;
+      const mg = detectMuscleGroup(ex.name);
+      card.style.borderLeftColor = mg ? mg.color : 'var(--border)';
       let sH=`<div class="sets-head"><span>#</span><span>kg</span><span>reps</span><span>feel</span><span></span></div>`;
       ex.sets.forEach((s,si)=>{
         sH+=`<div class="set-row">
@@ -722,6 +764,7 @@
       card.innerHTML=`
         <div class="ex-top">
           <span class="ex-index">${mi+1}.</span>
+          <span class="mg-dot" id="mg-dot-${ex.id}" title="${mg?mg.label:'other'}" style="background:${mg?mg.color:'var(--text-faint)'}"></span>
           <input class="ex-name" type="text" data-mn="${ex.id}" placeholder="exercise name" value="${ex.name}" oninput="updMain(${ex.id},'name',this.value)">
           <button class="icon-btn" onclick="removeMain(${ex.id})">×</button>
         </div>
@@ -1578,9 +1621,10 @@
     // Summary of exercises
     let bodyHTML = '';
     entry.mains.filter(e=>e.name).forEach(ex => {
+      const mg = detectMuscleGroup(ex.name);
       const sets = ex.sets.filter(s=>s.weight||s.reps).map(s=>`${s.weight||'?'}kg × ${s.reps||'?'}`).join('  ');
       bodyHTML += `<div class="hist-ex">
-        <div class="hist-ex-name">${ex.name}</div>
+        <div class="hist-ex-name"><span class="mg-dot" style="background:${mg?mg.color:'var(--text-faint)'}"></span>${ex.name}</div>
         ${ex.sets.filter(s=>s.weight||s.reps).map((s,i)=>`<div class="hist-set-row">set ${i+1}  ${s.weight||'?'}kg × ${s.reps||'?'} reps${s.diff?'  ('+s.diff+')':''}</div>`).join('')}
       </div>`;
     });
@@ -1762,7 +1806,8 @@
         const arrow = (sA && sB) ? compareArrow(sA.weight, sB.weight) : `<span class="cmp-arrow-same">→</span>`;
         rowsHTML += `<div class="cmp-set-row"><span class="cmp-set-a">${txtA}</span><span class="cmp-set-b">${txtB}</span>${arrow}</div>`;
       }
-      block.innerHTML = `<div class="cmp-ex-name">${name}</div>${rowsHTML}`;
+      const mg = detectMuscleGroup(name);
+      block.innerHTML = `<div class="cmp-ex-name"><span class="mg-dot" style="background:${mg?mg.color:'var(--text-faint)'}"></span>${name}</div>${rowsHTML}`;
       view.appendChild(block);
     });
     if (!allExNames.length) {
