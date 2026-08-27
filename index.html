@@ -223,43 +223,43 @@
     .recover-error { font-size: 12.5px; color: var(--red); margin-bottom: 10px; }
     .recover-confirm-row { margin-top: 4px; }
 
-    /* TEMPLATES */
-    .tpl-list { display: flex; flex-direction: column; gap: 10px; margin-bottom: 10px; }
-    .tpl-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); overflow: hidden; animation: fadeIn 0.15s ease; }
-    .tpl-card-header { display: flex; align-items: center; gap: 8px; padding: 12px 14px; border-bottom: 1px solid var(--border); }
-    .tpl-name-input { flex: 1; border: none !important; border-bottom: 1px solid var(--border) !important; border-radius: 0 !important; background: transparent !important; font-size: 15px; font-weight: 500; padding: 2px 0 4px !important; }
-    .tpl-name-input:focus { outline: none; border-color: var(--border-strong) !important; }
-    .tpl-body { padding: 12px 14px; display: flex; flex-direction: column; gap: 10px; }
-    .tpl-section-label { font-size: 10px; font-family: var(--mono); text-transform: uppercase; letter-spacing: 0.1em; color: var(--text-faint); margin-bottom: 6px; }
-    .tpl-ex-row { display: flex; align-items: center; gap: 6px; margin-bottom: 5px; }
-    .tpl-ex-row input { flex: 1; font-size: 13px; padding: 5px 8px; height: 30px; }
-    .tpl-ex-row input.small { width: 80px; flex: none; font-family: var(--mono); text-align: center; }
-
-    .tpl-remove-ex { background: none; border: none; color: var(--text-faint); font-size: 14px; cursor: pointer; flex-shrink: 0; }
-    .tpl-remove-ex:hover { color: var(--red); }
-    .tpl-add-ex { font-size: 11px; font-family: var(--mono); color: var(--text); background: none; border: 1px dashed var(--border-strong); border-radius: var(--radius); padding: 4px 10px; cursor: pointer; margin-top: 2px; }
-    .tpl-add-ex:hover { border-color: var(--border-strong); color: var(--text); }
-    .tpl-footer { display: flex; align-items: center; justify-content: space-between; padding: 10px 14px; border-top: 1px solid var(--border); background: var(--bg); }
-    .load-tpl-btn { font-size: 12px; font-family: var(--mono); padding: 6px 14px; border: 1px solid var(--border-strong); border-radius: var(--radius); background: none; color: var(--text); cursor: pointer; }
-    .load-tpl-btn:hover { background: var(--surface); }
-    .del-tpl-btn { font-size: 12px; font-family: var(--mono); color: var(--text-faint); background: none; border: none; cursor: pointer; }
-    .del-tpl-btn:hover { color: var(--red); }
-
-    /* PLANNER */
-    .plan-list { display: flex; flex-direction: column; gap: 12px; margin-bottom: 10px; }
-    .plan-day { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); overflow: hidden; animation: fadeIn 0.15s ease; }
-    .plan-day-header { display: flex; align-items: center; gap: 8px; padding: 10px 14px; border-bottom: 1px solid var(--border); background: var(--bg); }
-    .plan-day-name { flex: 1; border: none !important; border-bottom: 1px solid var(--border) !important; border-radius: 0 !important; background: transparent !important; font-size: 14px; font-weight: 500; padding: 2px 0 3px !important; }
-    .plan-day-name:focus { outline: none; border-color: var(--border-strong) !important; }
-    .plan-day-body { padding: 12px 14px; }
-    .plan-ex-row { display: flex; align-items: center; gap: 6px; margin-bottom: 0; }
-    .plan-ex-num { font-family: var(--mono); font-size: 11px; color: var(--text-faint); min-width: 16px; }
-    .plan-ex-input { flex: 1; font-size: 13px; padding: 5px 8px; height: 30px; }
-    .plan-remove-ex { background: none; border: none; color: var(--text-faint); font-size: 14px; cursor: pointer; }
-    .plan-remove-ex:hover { color: var(--red); }
-    .plan-add-ex { font-size: 11px; font-family: var(--mono); color: var(--text); background: none; border: 1px dashed var(--border-strong); border-radius: var(--radius); padding: 4px 10px; cursor: pointer; margin-top: 6px; }
-    .plan-add-ex:hover { border-color: var(--border-strong); color: var(--text); }
-    .plan-notes { margin-top: 8px; font-size: 13px; }
+    /* WORKOUTS (merged templates + planner) */
+    .wp-list { display: flex; flex-direction: column; gap: 10px; margin-bottom: 10px; }
+    .wp-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); overflow: hidden; animation: fadeIn 0.15s ease; }
+    .wp-card-header { display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 11px 14px; cursor: pointer; }
+    .wp-card-header:hover { background: var(--bg); }
+    .wp-card-title { font-size: 13px; font-weight: 500; color: var(--text); }
+    .wp-card-meta { font-size: 11px; font-family: var(--mono); color: var(--text-muted); margin-top: 2px; }
+    .wp-card-actions { display: flex; gap: 6px; align-items: center; flex-shrink: 0; }
+    .wp-card-body { padding: 0 14px 12px; border-top: 1px solid var(--border); }
+    .wp-btn { font-size: 11px; font-family: var(--mono); padding: 5px 10px; border: 1px solid var(--border-strong); border-radius: var(--radius); background: none; color: var(--text); cursor: pointer; white-space: nowrap; }
+    .wp-btn:hover { background: var(--bg); }
+    .wp-btn-del { background: none; border: none; color: var(--text-faint); font-size: 15px; cursor: pointer; padding: 0 2px; }
+    .wp-btn-del:hover { color: var(--red); }
+    /* read-only (view mode) rows */
+    .wp-view-ex { display: flex; align-items: center; gap: 6px; font-size: 13px; color: var(--text); padding: 6px 0; border-bottom: 1px solid var(--border); }
+    .wp-view-ex:last-child { border-bottom: none; }
+    .wp-view-ex-name { flex: 1; }
+    .wp-view-ex-target { font-family: var(--mono); font-size: 11px; color: var(--text-faint); flex-shrink: 0; }
+    .wp-view-section-label { font-size: 10px; font-family: var(--mono); text-transform: uppercase; letter-spacing: 0.1em; color: var(--text-faint); margin: 10px 0 2px; }
+    .wp-view-notes { font-size: 12px; color: var(--text-muted); margin-top: 10px; padding-top: 8px; border-top: 1px solid var(--border); white-space: pre-wrap; }
+    .wp-empty-body { font-size: 12px; color: var(--text-faint); padding: 10px 0; }
+    /* edit mode rows */
+    .wp-name-input { flex: 1; border: none !important; border-bottom: 1px solid var(--border) !important; border-radius: 0 !important; background: transparent !important; font-size: 15px; font-weight: 500; padding: 2px 0 4px !important; }
+    .wp-name-input:focus { outline: none; border-color: var(--border-strong) !important; }
+    .wp-section-label { font-size: 10px; font-family: var(--mono); text-transform: uppercase; letter-spacing: 0.1em; color: var(--text-faint); margin: 12px 0 6px; }
+    .wp-ex-row { display: flex; align-items: center; gap: 6px; margin-bottom: 5px; flex-wrap: wrap; }
+    .wp-ex-row input { flex: 1; min-width: 90px; font-size: 13px; padding: 5px 8px; height: 30px; }
+    .wp-ex-row input.wp-small { width: 52px; flex: none; font-family: var(--mono); text-align: center; min-width: 0; }
+    .wp-remove-ex { background: none; border: none; color: var(--text-faint); font-size: 14px; cursor: pointer; flex-shrink: 0; }
+    .wp-remove-ex:hover { color: var(--red); }
+    .wp-add-ex { font-size: 11px; font-family: var(--mono); color: var(--text); background: none; border: 1px dashed var(--border-strong); border-radius: var(--radius); padding: 4px 10px; cursor: pointer; margin-top: 2px; }
+    .wp-add-ex:hover { border-color: var(--border-strong); color: var(--text); }
+    .wp-notes-input { margin-top: 8px; font-size: 13px; }
+    .wp-warmup-toggle { font-size: 10px; font-family: var(--mono); color: var(--text-muted); background: none; border: 1px solid var(--border); border-radius: 5px; padding: 2px 7px; cursor: pointer; white-space: nowrap; height: 30px; flex: none; }
+    .wp-warmup-box { margin: 4px 0 8px; background: var(--bg); border: 1px solid var(--border); border-radius: var(--radius); padding: 8px 10px; width: 100%; }
+    .wp-warmup-row { display: grid; grid-template-columns: 24px 1fr 1fr 24px; gap: 6px; margin-bottom: 5px; align-items: center; }
+    .wp-warmup-row input { height: 28px; font-size: 12px; font-family: var(--mono); padding: 4px 8px; text-align: center; }
 
     /* PERIODIZATION */
 
@@ -331,7 +331,7 @@
 <!-- NAVBAR -->
 <div class="navbar">
   <div class="navbar-inner">
-    <div class="logo">gym_log <span style="font-size:10px;color:var(--text-faint);font-weight:400;">v3.8</span></div>
+    <div class="logo">gym_log <span style="font-size:10px;color:var(--text-faint);font-weight:400;">v3.9</span></div>
     <div class="navbar-right">
       <button class="theme-toggle" onclick="toggleTheme()" title="toggle theme"></button>
       <button class="hamburger" onclick="openMenu()"><span></span><span></span><span></span></button>
@@ -350,8 +350,7 @@
     <div class="menu-section-label">navigate</div>
     <button class="menu-item active" id="mi-logger"  onclick="switchPage('logger');closeMenu()"><span class="menu-item-icon">📋</span>gym logger</button>
     <button class="menu-item" id="mi-history"       onclick="switchPage('history');closeMenu()"><span class="menu-item-icon">📊</span>history</button>
-    <button class="menu-item" id="mi-templates"      onclick="switchPage('templates');closeMenu()"><span class="menu-item-icon">⚡</span>templates</button>
-    <button class="menu-item" id="mi-planner"        onclick="switchPage('planner');closeMenu()"><span class="menu-item-icon">📅</span>workout planner</button>
+    <button class="menu-item" id="mi-workouts"       onclick="switchPage('workouts');closeMenu()"><span class="menu-item-icon">🗂️</span>workouts</button>
   </div>
 </div>
 
@@ -461,16 +460,10 @@
     </div>
   </div>
 
-  <!-- PAGE: TEMPLATES -->
-  <div class="page" id="page-templates">
-    <div class="tpl-list" id="tplList"></div>
-    <button class="add-any-btn" onclick="addTemplate()">+ new template</button>
-  </div>
-
-  <!-- PAGE: PLANNER -->
-  <div class="page" id="page-planner">
-    <div class="plan-list" id="planList"></div>
-    <button class="add-any-btn" onclick="addPlanDay()">+ add day</button>
+  <!-- PAGE: WORKOUTS (merged templates + planner) -->
+  <div class="page" id="page-workouts">
+    <div class="wp-list" id="wpList"></div>
+    <button class="add-any-btn" onclick="addWorkoutPlan()">+ new workout</button>
   </div>
 
   <div class="page" id="page-history">
@@ -636,7 +629,7 @@
     const restored = restoreSession();
     renderDateStr();
     if (!restored) { addMain(); addCardio(); addCoreSet(); }
-    renderTemplates(); renderPlanner();
+    migrateToWorkoutPlans();
     renderCoreExDatalist();
     renderMGLegend('mgLegendLog');
 
@@ -653,11 +646,12 @@
   function switchPage(id) {
     document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
     document.getElementById('page-'+id).classList.add('active');
-    ['logger','history','templates','planner'].forEach(n=>{
+    ['logger','history','workouts'].forEach(n=>{
       const el=document.getElementById('mi-'+n);
       if(el) el.classList.toggle('active', n===id);
     });
     if (id==='history') { renderHistory(); renderBig3(); renderMGLegend('mgLegendHist'); }
+    if (id==='workouts') { renderWorkoutPlans(); }
   }
 
   /* COLLAPSIBLE SECTIONS */
@@ -1001,146 +995,181 @@
     btn.disabled=false; btn.textContent='send to telegram';
   }
 
-  /* TEMPLATES */
-  function loadTemplates() { try { return JSON.parse(localStorage.getItem('gymlog_templates')||'[]'); } catch { return []; } }
-  function saveTemplates(arr) { localStorage.setItem('gymlog_templates',JSON.stringify(arr)); }
-  function addTemplate() {
-    const arr=loadTemplates(), id=Date.now();
-    arr.push({id,name:'',mainExs:[{name:''}],cardioExs:[{name:'',duration:''}],coreSets:[{exercises:[{name:'',duration:''}]}]});
-    saveTemplates(arr); renderTemplates();
+  /* WORKOUTS (merged templates + planner) */
+  // Unified data model: each entry is a workout "day" that can hold
+  // exercise names with an optional target sets/reps range (planner-style),
+  // cardio, and core sets (template-style), plus notes. "load into logger"
+  // drops just the exercise names into today's log — no weights/reps
+  // carried over, since those are today's numbers, not the plan's.
+  function loadWorkoutPlans() { try { return JSON.parse(localStorage.getItem('gymlog_workouts')||'[]'); } catch { return []; } }
+  function saveWorkoutPlans(arr) { localStorage.setItem('gymlog_workouts',JSON.stringify(arr)); }
+  function updateWorkoutPlan(id,fn) { const arr=loadWorkoutPlans(),p=arr.find(p=>p.id===id); if(p){fn(p);saveWorkoutPlans(arr);} }
+  function addWorkoutPlan() {
+    const arr=loadWorkoutPlans(), id=Date.now();
+    arr.unshift({id,name:'',mainExs:[{name:'',sets:'',reps:''}],cardioExs:[],coreSets:[],notes:''});
+    saveWorkoutPlans(arr);
+    wpEditingIds.add(id); wpExpandedIds.add(id);
+    renderWorkoutPlans();
   }
-  function deleteTemplate(id) { saveTemplates(loadTemplates().filter(t=>t.id!==id)); renderTemplates(); }
-  function updateTemplate(id,fn) { const arr=loadTemplates(),t=arr.find(t=>t.id===id); if(t){fn(t);saveTemplates(arr);} }
-  function loadTemplateIntoLogger(id) {
-    const t=loadTemplates().find(t=>t.id===id); if(!t) return;
+  function deleteWorkoutPlan(id) { saveWorkoutPlans(loadWorkoutPlans().filter(p=>p.id!==id)); wpEditingIds.delete(id); wpExpandedIds.delete(id); renderWorkoutPlans(); }
+
+  // One-time migration: if gymlog_workouts has never been created, build it
+  // from whatever old gymlog_templates / gymlog_planner data exists so
+  // nothing gets lost when the two old tabs merge into this one.
+  function migrateToWorkoutPlans() {
+    if (localStorage.getItem('gymlog_workouts') !== null) return;
+    const merged = [];
+    try {
+      const templates = JSON.parse(localStorage.getItem('gymlog_templates')||'[]');
+      templates.forEach(t => merged.push({
+        id: t.id || Date.now()+Math.floor(Math.random()*1000),
+        name: t.name || '',
+        mainExs: (t.mainExs||[]).map(e=>({name:e.name||'',sets:'',reps:''})),
+        cardioExs: (t.cardioExs||[]).filter(e=>e.name).map(e=>({name:e.name,duration:e.duration||''})),
+        coreSets: (t.coreSets||[]).filter(cs=>(cs.exercises||[]).some(e=>e.name)),
+        notes: ''
+      }));
+    } catch {}
+    try {
+      const planner = JSON.parse(localStorage.getItem('gymlog_planner')||'[]');
+      planner.forEach(d => merged.push({
+        id: d.id || Date.now()+Math.floor(Math.random()*1000),
+        name: d.name || '',
+        mainExs: (d.exercises||[]).map(e=>({name:e.name||'',sets:e.sets||'',reps:e.reps||'',warmup:e.warmup,warmupOpen:false})),
+        cardioExs: [],
+        coreSets: [],
+        notes: d.notes || ''
+      }));
+    } catch {}
+    if (merged.length) saveWorkoutPlans(merged);
+    else localStorage.setItem('gymlog_workouts','[]');
+  }
+
+  let wpExpandedIds = new Set();
+  let wpEditingIds = new Set();
+
+  function toggleWPCard(id) {
+    if (wpEditingIds.has(id)) return; // don't collapse while editing
+    if (wpExpandedIds.has(id)) wpExpandedIds.delete(id); else wpExpandedIds.add(id);
+    renderWorkoutPlans();
+  }
+  function toggleWPEdit(id) {
+    if (wpEditingIds.has(id)) { wpEditingIds.delete(id); }
+    else { wpEditingIds.add(id); wpExpandedIds.add(id); }
+    renderWorkoutPlans();
+  }
+
+  function loadWorkoutPlanIntoLogger(id) {
+    const p = loadWorkoutPlans().find(p=>p.id===id); if (!p) return;
     mains=[]; cardios=[]; cores=[]; uid=0;
-    t.mainExs.forEach(ex=>{const eid=++uid;mains.push({id:eid,name:ex.name,sets:[{reps:'',weight:'',diff:''}],notes:''}); });
-    t.cardioExs.forEach(ex=>{const eid=++uid;cardios.push({id:eid,type:ex.name,duration:ex.duration,notes:''});});
-    t.coreSets.forEach(cs=>{const setId=++uid;const exercises=cs.exercises.map(ex=>({id:++uid,name:ex.name,duration:ex.duration}));cores.push({id:setId,exercises});});
+    p.mainExs.filter(ex=>ex.name).forEach(ex=>{ const eid=++uid; mains.push({id:eid,name:ex.name,sets:[{reps:'',weight:'',diff:''}],notes:''}); });
+    p.cardioExs.filter(ex=>ex.name).forEach(ex=>{ const eid=++uid; cardios.push({id:eid,type:ex.name,duration:ex.duration||'',notes:''}); });
+    (p.coreSets||[]).forEach(cs=>{ const setId=++uid; const exercises=(cs.exercises||[]).filter(ex=>ex.name).map(ex=>({id:++uid,name:ex.name,duration:ex.duration||''})); if(exercises.length) cores.push({id:setId,exercises}); });
     if(!mains.length){const id=++uid;mains.push({id,name:'',sets:[{reps:'',weight:'',diff:''}],notes:''});}
     if(!cardios.length){const id=++uid;cardios.push({id,type:'',duration:'',notes:''});}
     if(!cores.length){const setId=++uid,ex1=++uid;cores.push({id:setId,exercises:[{id:ex1,name:'',duration:''}]});}
-    document.getElementById('workoutName').value=t.name||'';
+    document.getElementById('workoutName').value = p.name || '';
     renderMain(); renderCardio(); renderCore();
-    switchPage('logger'); showToast('Template loaded','ok');
+    switchPage('logger'); showToast('Workout loaded into logger','ok');
   }
-  function renderTemplates() {
-    const list=document.getElementById('tplList'), arr=loadTemplates();
-    list.innerHTML='';
-    if(!arr.length){list.innerHTML=`<div style="font-size:13px;color:var(--text-faint);font-family:var(--mono);text-align:center;padding:2rem 0;">no templates yet</div>`;return;}
-    arr.forEach(t=>{
-      const card=document.createElement('div'); card.className='tpl-card';
-      let mainRows=t.mainExs.map((ex,i)=>`<div class="tpl-ex-row"><input type="text" placeholder="exercise name" value="${ex.name}" oninput="updateTemplate(${t.id},t=>{t.mainExs[${i}].name=this.value})"><button class="tpl-remove-ex" onclick="updateTemplate(${t.id},t=>{t.mainExs.splice(${i},1)});renderTemplates()">×</button></div>`).join('');
-      let cardioRows=t.cardioExs.map((ex,i)=>`<div class="tpl-ex-row"><input type="text" placeholder="type" value="${ex.name}" oninput="updateTemplate(${t.id},t=>{t.cardioExs[${i}].name=this.value})"><input type="number" class="small" min="0" placeholder="min" value="${ex.duration}" onchange="updateTemplate(${t.id},t=>{t.cardioExs[${i}].duration=this.value})"><button class="tpl-remove-ex" onclick="updateTemplate(${t.id},t=>{t.cardioExs.splice(${i},1)});renderTemplates()">×</button></div>`).join('');
-      let coreHTML=t.coreSets.map((cs,si)=>{
-        const exRows=cs.exercises.map((ex,ei)=>{
-          return `<div class="tpl-ex-row" style="flex-wrap:wrap;gap:4px;"><input type="text" placeholder="exercise" value="${ex.name}" style="min-width:100px;" oninput="updateTemplate(${t.id},t=>{t.coreSets[${si}].exercises[${ei}].name=this.value})"><input type="number" class="small" min="0" placeholder="sec" value="${ex.duration}" onchange="updateTemplate(${t.id},t=>{t.coreSets[${si}].exercises[${ei}].duration=this.value})"><button class="tpl-remove-ex" onclick="updateTemplate(${t.id},t=>{if(t.coreSets[${si}].exercises.length>1)t.coreSets[${si}].exercises.splice(${ei},1)});renderTemplates()">×</button></div>`;
+
+  function wpWarmupSection(p, i, ex) {
+    const isBig3 = BIG3.includes((ex.name||'').toLowerCase().trim());
+    if (!isBig3) return { toggle:'', box:'' };
+    const open = ex.warmupOpen||false;
+    const warmup = ex.warmup||[{kg:'',reps:''}];
+    const toggle = `<button class="wp-warmup-toggle" onclick="updateWorkoutPlan(${p.id},p=>{p.mainExs[${i}].warmupOpen=!p.mainExs[${i}].warmupOpen; if(!p.mainExs[${i}].warmup)p.mainExs[${i}].warmup=[{kg:'',reps:''}]});renderWorkoutPlans()">warmup ${open?'▴':'▾'}</button>`;
+    const box = open ? `<div class="wp-warmup-box">
+        <div style="display:grid;grid-template-columns:24px 1fr 1fr 24px;gap:6px;margin-bottom:4px;">
+          <span></span><span style="font-size:10px;font-family:var(--mono);color:var(--text-faint);text-transform:uppercase;letter-spacing:.06em;text-align:center;">kg</span><span style="font-size:10px;font-family:var(--mono);color:var(--text-faint);text-transform:uppercase;letter-spacing:.06em;text-align:center;">reps</span><span></span>
+        </div>
+        ${warmup.map((w,wi)=>`<div class="wp-warmup-row">
+          <span style="font-size:10px;font-family:var(--mono);color:var(--text-faint);text-align:center;">W${wi+1}</span>
+          <input type="text" placeholder="—" value="${w.kg||''}" onblur="updateWorkoutPlan(${p.id},p=>{p.mainExs[${i}].warmup[${wi}].kg=this.value})">
+          <input type="text" placeholder="—" value="${w.reps||''}" onblur="updateWorkoutPlan(${p.id},p=>{p.mainExs[${i}].warmup[${wi}].reps=this.value})">
+          <button class="wp-remove-ex" onclick="updateWorkoutPlan(${p.id},p=>{if(p.mainExs[${i}].warmup.length>1)p.mainExs[${i}].warmup.splice(${wi},1)});renderWorkoutPlans()">×</button>
+        </div>`).join('')}
+        <button class="wp-add-ex" style="width:100%;" onclick="updateWorkoutPlan(${p.id},p=>{if(!p.mainExs[${i}].warmup)p.mainExs[${i}].warmup=[{kg:'',reps:''}];p.mainExs[${i}].warmup.push({kg:'',reps:''})});renderWorkoutPlans()">+ set</button>
+      </div>` : '';
+    return { toggle, box };
+  }
+
+  function renderWorkoutPlans() {
+    const list = document.getElementById('wpList'), arr = loadWorkoutPlans();
+    list.innerHTML = '';
+    if (!arr.length) { list.innerHTML = `<div style="font-size:13px;color:var(--text-faint);font-family:var(--mono);text-align:center;padding:2rem 0;">no workouts yet</div>`; return; }
+    arr.forEach(p => {
+      const editing = wpEditingIds.has(p.id);
+      const expanded = wpExpandedIds.has(p.id);
+      const exCount = (p.mainExs||[]).filter(e=>e.name).length;
+      const card = document.createElement('div');
+      card.className = 'wp-card';
+
+      let bodyHTML;
+      if (editing) {
+        const mainRows = p.mainExs.map((ex,i) => `<div class="wp-ex-row">
+            <input type="text" placeholder="exercise name" value="${ex.name||''}" onblur="updateWorkoutPlan(${p.id},p=>{p.mainExs[${i}].name=this.value});renderWorkoutPlans()">
+            <input type="text" class="wp-small" placeholder="sets" value="${ex.sets||''}" onblur="updateWorkoutPlan(${p.id},p=>{p.mainExs[${i}].sets=this.value})">
+            <input type="text" class="wp-small" placeholder="reps" value="${ex.reps||''}" onblur="updateWorkoutPlan(${p.id},p=>{p.mainExs[${i}].reps=this.value})">
+            ${wpWarmupSection(p,i,ex).toggle}
+            <button class="wp-remove-ex" onclick="updateWorkoutPlan(${p.id},p=>{p.mainExs.splice(${i},1)});renderWorkoutPlans()">×</button>
+            ${wpWarmupSection(p,i,ex).box}
+          </div>`).join('');
+        const cardioRows = p.cardioExs.map((ex,i) => `<div class="wp-ex-row">
+            <input type="text" placeholder="type" value="${ex.name||''}" oninput="updateWorkoutPlan(${p.id},p=>{p.cardioExs[${i}].name=this.value})">
+            <input type="text" class="wp-small" placeholder="min" value="${ex.duration||''}" onblur="updateWorkoutPlan(${p.id},p=>{p.cardioExs[${i}].duration=this.value})">
+            <button class="wp-remove-ex" onclick="updateWorkoutPlan(${p.id},p=>{p.cardioExs.splice(${i},1)});renderWorkoutPlans()">×</button>
+          </div>`).join('');
+        const coreHTML = (p.coreSets||[]).map((cs,si) => {
+          const exRows = (cs.exercises||[]).map((ex,ei) => `<div class="wp-ex-row">
+              <input type="text" placeholder="exercise" value="${ex.name||''}" oninput="updateWorkoutPlan(${p.id},p=>{p.coreSets[${si}].exercises[${ei}].name=this.value})">
+              <input type="text" class="wp-small" placeholder="sec" value="${ex.duration||''}" onblur="updateWorkoutPlan(${p.id},p=>{p.coreSets[${si}].exercises[${ei}].duration=this.value})">
+              <button class="wp-remove-ex" onclick="updateWorkoutPlan(${p.id},p=>{if(p.coreSets[${si}].exercises.length>1)p.coreSets[${si}].exercises.splice(${ei},1)});renderWorkoutPlans()">×</button>
+            </div>`).join('');
+          return `<div style="margin-bottom:8px;"><div style="font-size:10px;font-family:var(--mono);color:var(--text-faint);text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px;">set ${si+1}</div>${exRows}${(cs.exercises||[]).length<3?`<button class="wp-add-ex" onclick="updateWorkoutPlan(${p.id},p=>{p.coreSets[${si}].exercises.push({name:'',duration:''})});renderWorkoutPlans()">+ exercise</button>`:''}<button class="wp-remove-ex" style="font-size:11px;font-family:var(--mono);margin-top:4px;" onclick="updateWorkoutPlan(${p.id},p=>{p.coreSets.splice(${si},1)});renderWorkoutPlans()">remove set</button></div>`;
         }).join('');
-        return `<div style="margin-bottom:8px;"><div style="font-size:10px;font-family:var(--mono);color:var(--text-faint);text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px;">set ${si+1}</div>${exRows}${cs.exercises.length<3?`<button class="tpl-add-ex" onclick="updateTemplate(${t.id},t=>{t.coreSets[${si}].exercises.push({name:'',duration:''})});renderTemplates()">+ exercise</button>`:''}<button class="tpl-remove-ex" style="font-size:11px;font-family:var(--mono);margin-top:4px;" onclick="updateTemplate(${t.id},t=>{if(t.coreSets.length>0)t.coreSets.splice(${si},1)});renderTemplates()">remove set</button></div>`;
-      }).join('');
-      card.innerHTML=`
-        <div class="tpl-card-header"><input class="tpl-name-input" type="text" placeholder="template name" value="${t.name}" oninput="updateTemplate(${t.id},t=>{t.name=this.value})"></div>
-        <div class="tpl-body">
-          <div><div class="tpl-section-label">🏋️ exercises</div>${mainRows}<button class="tpl-add-ex" onclick="updateTemplate(${t.id},t=>{t.mainExs.push({name:''})});renderTemplates()">+ exercise</button></div>
-          <div><div class="tpl-section-label">🏃 cardio</div>${cardioRows}<button class="tpl-add-ex" onclick="updateTemplate(${t.id},t=>{t.cardioExs.push({name:'',duration:''})});renderTemplates()">+ cardio</button></div>
-          <div><div class="tpl-section-label">🔥 core</div>${coreHTML}${t.coreSets.length<MAX_CORE_SETS?`<button class="tpl-add-ex" onclick="updateTemplate(${t.id},t=>{t.coreSets.push({exercises:[{name:'',duration:''}]})});renderTemplates()">+ set</button>`:''}</div>
+        bodyHTML = `
+          <div class="wp-section-label">🏋️ exercises</div>${mainRows}<button class="wp-add-ex" onclick="updateWorkoutPlan(${p.id},p=>{p.mainExs.push({name:'',sets:'',reps:''})});renderWorkoutPlans()">+ exercise</button>
+          <div class="wp-section-label">🏃 cardio</div>${cardioRows}<button class="wp-add-ex" onclick="updateWorkoutPlan(${p.id},p=>{p.cardioExs.push({name:'',duration:''})});renderWorkoutPlans()">+ cardio</button>
+          <div class="wp-section-label">🔥 core</div>${coreHTML}${(p.coreSets||[]).length<MAX_CORE_SETS?`<button class="wp-add-ex" onclick="updateWorkoutPlan(${p.id},p=>{p.coreSets.push({exercises:[{name:'',duration:''}]})});renderWorkoutPlans()">+ set</button>`:''}
+          <textarea class="wp-notes-input" rows="2" placeholder="notes, tips, reminders…" onblur="updateWorkoutPlan(${p.id},p=>{p.notes=this.value})">${p.notes||''}</textarea>
+          <div style="margin-top:10px;"><button class="wp-btn" onclick="toggleWPEdit(${p.id})">done editing</button></div>`;
+      } else {
+        const mainRows = p.mainExs.filter(e=>e.name).map(ex => {
+          const mg = detectMuscleGroup(ex.name);
+          const target = (ex.sets||ex.reps) ? `${ex.sets||'?'} × ${ex.reps||'?'}` : '';
+          return `<div class="wp-view-ex"><span class="mg-dot" style="background:${mg?mg.color:'var(--text-faint)'}"></span><span class="wp-view-ex-name">${ex.name}</span><span class="wp-view-ex-target">${target}</span></div>`;
+        }).join('');
+        const cardioRows = p.cardioExs.filter(e=>e.name).map(ex => `<div class="wp-view-ex"><span class="wp-view-ex-name">${ex.name}</span><span class="wp-view-ex-target">${ex.duration?ex.duration+' min':''}</span></div>`).join('');
+        const coreRows = (p.coreSets||[]).map((cs,si) => (cs.exercises||[]).filter(e=>e.name).map(ex=>`<div class="wp-view-ex"><span class="wp-view-ex-name">${ex.name}</span><span class="wp-view-ex-target">${ex.duration?ex.duration+'s':''}</span></div>`).join('')).join('');
+        const notesHTML = p.notes ? `<div class="wp-view-notes">${p.notes}</div>` : '';
+        const anyContent = mainRows || cardioRows || coreRows;
+        bodyHTML = anyContent ? `
+          ${mainRows}
+          ${cardioRows?`<div class="wp-view-section-label">cardio</div>${cardioRows}`:''}
+          ${coreRows?`<div class="wp-view-section-label">core</div>${coreRows}`:''}
+          ${notesHTML}
+          <div style="margin-top:10px;"><button class="wp-btn" onclick="toggleWPEdit(${p.id})">edit</button></div>
+        ` : `<div class="wp-empty-body">no exercises yet</div><div style="margin-top:6px;"><button class="wp-btn" onclick="toggleWPEdit(${p.id})">edit</button></div>`;
+      }
+
+      card.innerHTML = `
+        <div class="wp-card-header" onclick="${editing?'':`toggleWPCard(${p.id})`}">
+          <div style="flex:1;min-width:0;">
+            ${editing
+              ? `<input class="wp-name-input" type="text" placeholder="workout name" value="${p.name||''}" onclick="event.stopPropagation()" oninput="updateWorkoutPlan(${p.id},p=>{p.name=this.value})">`
+              : `<div class="wp-card-title">${p.name||'untitled workout'}</div><div class="wp-card-meta">${exCount} exercise${exCount===1?'':'s'}</div>`}
+          </div>
+          <div class="wp-card-actions">
+            <button class="wp-btn" onclick="event.stopPropagation();loadWorkoutPlanIntoLogger(${p.id})">load →</button>
+            <button class="wp-btn-del" onclick="event.stopPropagation();deleteWorkoutPlan(${p.id})">×</button>
+          </div>
         </div>
-        <div class="tpl-footer"><button class="load-tpl-btn" onclick="loadTemplateIntoLogger(${t.id})">load into logger →</button><button class="del-tpl-btn" onclick="deleteTemplate(${t.id})">delete</button></div>`;
+        <div class="wp-card-body" style="display:${expanded?'block':'none'};">${bodyHTML}</div>`;
       list.appendChild(card);
     });
   }
 
-  /* PLANNER */
-  function loadPlanner() { try { return JSON.parse(localStorage.getItem('gymlog_planner')||'[]'); } catch { return []; } }
-  function savePlanner(arr) { localStorage.setItem('gymlog_planner',JSON.stringify(arr)); }
-  function addPlanDay() {
-    const arr=loadPlanner();
-    arr.push({id:Date.now(),name:'',exercises:[{name:'',sets:'',reps:''},{name:'',sets:'',reps:''},{name:'',sets:'',reps:''}],notes:''});
-    savePlanner(arr); renderPlanner();
-  }
-  function updatePlanner(id,fn) { const arr=loadPlanner(),d=arr.find(d=>d.id===id); if(d){fn(d);savePlanner(arr);} }
-  function deletePlanDay(id) { savePlanner(loadPlanner().filter(d=>d.id!==id)); renderPlanner(); }
-  function toggleWarmup(dayId,exIdx) {
-    const arr=loadPlanner(),d=arr.find(d=>d.id===dayId); if(!d) return;
-    const ex=d.exercises[exIdx];
-    ex.warmupOpen=!ex.warmupOpen;
-    if(!ex.warmup) ex.warmup=[{kg:'',reps:''}];
-    savePlanner(arr); renderPlanner();
-  }
-  function addWarmupSet(dayId,exIdx) {
-    const arr=loadPlanner(),d=arr.find(d=>d.id===dayId); if(!d) return;
-    const ex=d.exercises[exIdx];
-    if(!ex.warmup) ex.warmup=[{kg:'',reps:''}];
-    ex.warmup.push({kg:'',reps:''});
-    savePlanner(arr); renderPlanner();
-  }
-  function removeWarmupSet(dayId,exIdx,wi) {
-    const arr=loadPlanner(),d=arr.find(d=>d.id===dayId); if(!d) return;
-    const ex=d.exercises[exIdx];
-    if(ex.warmup&&ex.warmup.length>1) ex.warmup.splice(wi,1);
-    savePlanner(arr); renderPlanner();
-  }
-
-  function renderPlanner() {
-    const list=document.getElementById('planList'), arr=loadPlanner();
-    list.innerHTML='';
-    if(!arr.length){list.innerHTML=`<div style="font-size:13px;color:var(--text-faint);font-family:var(--mono);text-align:center;padding:2rem 0;">no days yet</div>`;return;}
-    arr.forEach(d=>{
-      const card=document.createElement('div'); card.className='plan-day';
-      const exRows=d.exercises.map((ex,i)=>{
-        const isBig3=BIG3.includes((ex.name||'').toLowerCase().trim());
-        const warmupOpen=ex.warmupOpen||false;
-        const warmup=ex.warmup||[{kg:'',reps:''}];
-        const warmupToggle=isBig3?`<button onclick="toggleWarmup(${d.id},${i})" style="font-size:11px;font-family:var(--mono);color:var(--text-muted);background:none;border:1px solid var(--border);border-radius:5px;padding:2px 7px;cursor:pointer;white-space:nowrap;height:30px;flex:none;">warmup ${warmupOpen?'▴':'▾'}</button>`:'';
-        const warmupSection=(isBig3&&warmupOpen)?`
-          <div style="margin:8px 0 4px 16px;background:var(--bg);border:1px solid var(--border);border-radius:var(--radius);padding:8px 10px;">
-            <div style="display:grid;grid-template-columns:24px 1fr 1fr 24px;gap:6px;margin-bottom:4px;">
-              <span></span>
-              <span style="font-size:10px;font-family:var(--mono);color:var(--text-faint);text-transform:uppercase;letter-spacing:.06em;text-align:center;">kg</span>
-              <span style="font-size:10px;font-family:var(--mono);color:var(--text-faint);text-transform:uppercase;letter-spacing:.06em;text-align:center;">reps</span>
-              <span></span>
-            </div>
-            ${warmup.map((w,wi)=>`
-              <div style="display:grid;grid-template-columns:24px 1fr 1fr 24px;gap:6px;margin-bottom:5px;align-items:center;">
-                <span style="font-size:10px;font-family:var(--mono);color:var(--text-faint);text-align:center;">W${wi+1}</span>
-                <input type="text" placeholder="—" value="${w.kg||''}" style="height:28px;font-size:12px;font-family:var(--mono);padding:4px 8px;text-align:center;" onblur="updatePlanner(${d.id},d=>{if(!d.exercises[${i}].warmup)d.exercises[${i}].warmup=[{kg:'',reps:''}];d.exercises[${i}].warmup[${wi}].kg=this.value})">
-                <input type="text" placeholder="—" value="${w.reps||''}" style="height:28px;font-size:12px;font-family:var(--mono);padding:4px 8px;text-align:center;" onblur="updatePlanner(${d.id},d=>{if(!d.exercises[${i}].warmup)d.exercises[${i}].warmup=[{kg:'',reps:''}];d.exercises[${i}].warmup[${wi}].reps=this.value})">
-                <button onclick="removeWarmupSet(${d.id},${i},${wi})" style="background:none;border:none;color:var(--text-faint);font-size:13px;cursor:pointer;line-height:1;">×</button>
-              </div>`).join('')}
-            <button onclick="addWarmupSet(${d.id},${i})" style="font-size:11px;font-family:var(--mono);color:var(--text-muted);background:none;border:1px dashed var(--border);border-radius:5px;padding:3px 8px;cursor:pointer;width:100%;margin-top:2px;">+ set</button>
-          </div>`:'';
-        return `<div style="margin-bottom:10px;">
-          <div class="plan-ex-row">
-            <span class="plan-ex-num">${i+1}.</span>
-            <input class="plan-ex-input" type="text" placeholder="exercise name" value="${ex.name||''}" onblur="updatePlanner(${d.id},d=>{d.exercises[${i}].name=this.value});renderPlanner()">
-            <input type="text" placeholder="sets" value="${ex.sets||''}" style="width:48px;height:30px;font-size:12px;font-family:var(--mono);padding:4px 6px;text-align:center;flex:none;" onblur="updatePlanner(${d.id},d=>{d.exercises[${i}].sets=this.value})">
-            <input type="text" placeholder="reps" value="${ex.reps||''}" style="width:60px;height:30px;font-size:12px;font-family:var(--mono);padding:4px 6px;text-align:center;flex:none;" onblur="updatePlanner(${d.id},d=>{d.exercises[${i}].reps=this.value})">
-            ${warmupToggle}
-            <button class="plan-remove-ex" onclick="updatePlanner(${d.id},d=>{if(d.exercises.length>1)d.exercises.splice(${i},1)});renderPlanner()">×</button>
-          </div>
-          ${warmupSection}
-        </div>`;
-      }).join('');
-      card.innerHTML=`
-        <div class="plan-day-header">
-          <input class="plan-day-name" type="text" placeholder="day name (e.g. push day)" value="${d.name}" onblur="updatePlanner(${d.id},d=>{d.name=this.value})">
-          <button class="icon-btn" style="font-size:15px;" onclick="deletePlanDay(${d.id})">×</button>
-        </div>
-        <div class="plan-day-body">
-          <div style="display:grid;grid-template-columns:16px 1fr 48px 60px auto 18px;gap:6px;margin-bottom:6px;">
-            <span></span>
-            <span style="font-size:10px;font-family:var(--mono);color:var(--text-faint);text-transform:uppercase;letter-spacing:.06em;">exercise</span>
-            <span style="font-size:10px;font-family:var(--mono);color:var(--text-faint);text-transform:uppercase;letter-spacing:.06em;text-align:center;">sets</span>
-            <span style="font-size:10px;font-family:var(--mono);color:var(--text-faint);text-transform:uppercase;letter-spacing:.06em;text-align:center;">reps</span>
-            <span></span><span></span>
-          </div>
-          ${exRows}
-          <button class="plan-add-ex" onclick="updatePlanner(${d.id},d=>{d.exercises.push({name:'',sets:'',reps:''})});renderPlanner()">+ exercise</button>
-          <textarea class="plan-notes" rows="2" placeholder="notes, tips, reminders…" onblur="updatePlanner(${d.id},d=>{d.notes=this.value})">${d.notes||''}</textarea>
-        </div>`;
-      list.appendChild(card);
-    });
-  }
 
   /* HISTORY */
   function loadHistory() { try { return JSON.parse(localStorage.getItem('gymlog_history')||'[]'); } catch { return []; } }
