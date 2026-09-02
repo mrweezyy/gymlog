@@ -343,7 +343,7 @@
 <!-- NAVBAR -->
 <div class="navbar">
   <div class="navbar-inner">
-    <div class="logo">gym_log <span style="font-size:10px;color:var(--text-faint);font-weight:400;">v4.0</span></div>
+    <div class="logo">gym_log <span style="font-size:10px;color:var(--text-faint);font-weight:400;">v4.1</span></div>
     <div class="navbar-right">
       <button class="theme-toggle" onclick="toggleTheme()" title="toggle theme"></button>
       <button class="hamburger" onclick="openMenu()"><span></span><span></span><span></span></button>
@@ -1781,6 +1781,14 @@
       bodyHTML += `<div class="hist-ex"><div class="hist-ex-name" style="margin-top:6px;">cardio</div>`;
       entry.cardios.filter(e=>e.type).forEach(c=>{
         bodyHTML += `<div class="hist-set-row">${c.type}${c.duration?' — '+c.duration+' min':''}${c.km?' — '+c.km+' km':''}</div>`;
+      });
+      bodyHTML += `</div>`;
+    }
+    const coreExercises = (entry.cores||[]).flatMap(c => (c.exercises||[]).filter(ex=>ex.name));
+    if (coreExercises.length) {
+      bodyHTML += `<div class="hist-ex"><div class="hist-ex-name" style="margin-top:6px;">core</div>`;
+      coreExercises.forEach(ex => {
+        bodyHTML += `<div class="hist-set-row">${ex.name}${ex.duration?' — '+ex.duration:''}</div>`;
       });
       bodyHTML += `</div>`;
     }
