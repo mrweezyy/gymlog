@@ -268,6 +268,18 @@
     .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
     .toast.ok  { background: var(--green); color: #fff; }
     .toast.err { background: var(--red); color: #fff; }
+
+    /* WEEK BANNER */
+    .week-banner { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 11px 13px; border-radius: var(--radius); border: 1px solid var(--border); font-family: var(--mono); font-size: 12px; line-height: 1.4; margin-bottom: 1.25rem; background: var(--surface); }
+    .week-banner.wb-ok { border-color: var(--green); color: var(--green); }
+    .week-banner.wb-warn { border-color: var(--border-strong); color: var(--text); }
+    .week-banner.wb-danger { border-color: var(--red); color: var(--red); }
+    .week-banner span { flex: 1; }
+    .wb-skip-btn { font-size: 10px; font-family: var(--mono); padding: 5px 9px; border-radius: 8px; border: 1px solid var(--border); background: none; color: var(--text-faint); cursor: pointer; white-space: nowrap; flex-shrink: 0; }
+    .wb-skip-btn:hover { border-color: var(--border-strong); color: var(--text); }
+    .skip-reason-row { display: flex; flex-wrap: wrap; gap: 8px; margin: 14px 0; }
+    .skip-reason-btn { flex: 1; min-width: 90px; padding: 10px; font-size: 12px; font-family: var(--mono); border: 1px solid var(--border); border-radius: var(--radius); background: none; color: var(--text); cursor: pointer; }
+    .skip-reason-btn:hover { border-color: var(--accent); }
     /* HISTORY PAGE */
     .history-toolbar { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; flex-wrap: wrap; gap: 8px; }
 
@@ -331,7 +343,7 @@
 <!-- NAVBAR -->
 <div class="navbar">
   <div class="navbar-inner">
-    <div class="logo">gym_log <span style="font-size:10px;color:var(--text-faint);font-weight:400;">v3.9</span></div>
+    <div class="logo">gym_log <span style="font-size:10px;color:var(--text-faint);font-weight:400;">v4.0</span></div>
     <div class="navbar-right">
       <button class="theme-toggle" onclick="toggleTheme()" title="toggle theme"></button>
       <button class="hamburger" onclick="openMenu()"><span></span><span></span><span></span></button>
@@ -365,6 +377,22 @@
   </div>
 </div>
 
+<!-- SKIP DAY MODAL -->
+<div class="modal-overlay" id="skipModal">
+  <div class="modal">
+    <p>Mark today as a rest day?</p>
+    <p style="font-size:12px;color:var(--text-faint);margin-top:6px;">Only for genuine reasons. This turns off tonight's reminder — it doesn't lower your weekly target of <span id="skipTargetNum"></span>.</p>
+    <div class="skip-reason-row">
+      <button class="skip-reason-btn" onclick="confirmSkip('sick')">sick</button>
+      <button class="skip-reason-btn" onclick="confirmSkip('travel')">traveling</button>
+      <button class="skip-reason-btn" onclick="confirmSkip('busy')">genuinely busy</button>
+    </div>
+    <div class="modal-btns">
+      <button class="modal-cancel" onclick="closeSkipModal()">cancel</button>
+    </div>
+  </div>
+</div>
+
 <!-- RECOVER FROM TELEGRAM MODAL -->
 <div class="modal-overlay" id="recoverModal">
   <div class="modal modal-wide">
@@ -387,6 +415,7 @@
 
   <!-- PAGE: LOGGER -->
   <div class="page active" id="page-logger">
+    <div class="week-banner" id="weekBanner"></div>
     <div class="tg-row">
       <div class="tg-block">
         <div class="tg-status">
@@ -495,6 +524,7 @@
 
 <script>
   const RELAY_URL = 'https://gymlog-relay.mrweezy.workers.dev';
+  const WEEKLY_TARGET = 3; // sessions/week — must match the target hardcoded in the Worker's cron logic
   const MAX_CORE_SETS = 3;
   const BIG3 = ['squat','bench press','deadlift'];
 
@@ -632,8 +662,10 @@
     migrateToWorkoutPlans();
     renderCoreExDatalist();
     renderMGLegend('mgLegendLog');
+    renderWeekBanner();
 
     initRemoteSync();
+    pullRemoteSkips();
 
     // Auto-save on any input change in the logger
     document.getElementById('page-logger').addEventListener('input', saveSession);
@@ -1172,6 +1204,88 @@
 
 
   /* HISTORY */
+  /* WEEK PROGRESS + REST-DAY TAGGING */
+  function isoDateStr(d) { return d.toISOString().slice(0,10); }
+
+  function getWeekBounds(d) {
+    // Monday–Sunday bounds (UTC-day arithmetic, matching how history dates are stamped via toISOString)
+    const day = d.getUTCDay(); // 0=Sun..6=Sat
+    const diffToMonday = (day === 0 ? -6 : 1 - day);
+    const monday = new Date(d);
+    monday.setUTCDate(d.getUTCDate() + diffToMonday);
+    monday.setUTCHours(0,0,0,0);
+    const sunday = new Date(monday);
+    sunday.setUTCDate(monday.getUTCDate() + 6);
+    return { monday: isoDateStr(monday), sunday: isoDateStr(sunday) };
+  }
+
+  function loadSkips() { try { return JSON.parse(localStorage.getItem('gymlog_skips')||'[]'); } catch { return []; } }
+  function saveSkips(arr) {
+    try { localStorage.setItem('gymlog_skips', JSON.stringify(arr)); } catch {}
+    relayFetch('/skips', { method: 'PUT', body: JSON.stringify(arr) });
+  }
+
+  function computeWeekProgress() {
+    const now = new Date();
+    const { monday, sunday } = getWeekBounds(now);
+    const count = loadHistory().filter(e => e.date >= monday && e.date <= sunday).length;
+    const todayStr = isoDateStr(now);
+    const skippedToday = loadSkips().some(s => s.date === todayStr);
+    const dow = now.getUTCDay() === 0 ? 7 : now.getUTCDay(); // 1..7, Mon..Sun
+    const daysLeft = 7 - dow + 1; // includes today
+    return { count, target: WEEKLY_TARGET, daysLeft, skippedToday };
+  }
+
+  function renderWeekBanner() {
+    const el = document.getElementById('weekBanner');
+    if (!el) return;
+    document.getElementById('skipTargetNum').textContent = WEEKLY_TARGET;
+    const { count, target, daysLeft, skippedToday } = computeWeekProgress();
+    const remaining = Math.max(0, target - count);
+    const dayWord = n => `${n} day${n===1?'':'s'}`;
+    let cls, text;
+    if (remaining === 0) {
+      cls = 'wb-ok';
+      text = `✅ ${count}/${target} done this week — you're set`;
+    } else if (skippedToday) {
+      cls = 'wb-warn';
+      text = `${count}/${target} this week · today's marked as rest · ${remaining} still needed, ${dayWord(daysLeft)} left`;
+    } else if (remaining >= daysLeft) {
+      cls = 'wb-danger';
+      text = `⚠ ${count}/${target} this week · ${remaining} needed in ${dayWord(daysLeft)} left`;
+    } else {
+      cls = 'wb-warn';
+      text = `${count}/${target} this week · ${remaining} more needed · ${dayWord(daysLeft)} left`;
+    }
+    el.className = 'week-banner ' + cls;
+    el.innerHTML = `<span>${text}</span>` + (remaining > 0 ? `<button class="wb-skip-btn" onclick="openSkipModal()">mark rest day</button>` : '');
+  }
+
+  function openSkipModal()  { document.getElementById('skipModal').classList.add('open'); }
+  function closeSkipModal() { document.getElementById('skipModal').classList.remove('open'); }
+
+  function confirmSkip(reason) {
+    const todayStr = isoDateStr(new Date());
+    const skips = loadSkips().filter(s => s.date !== todayStr); // one tag per day, latest wins
+    skips.unshift({ date: todayStr, reason });
+    saveSkips(skips);
+    closeSkipModal();
+    renderWeekBanner();
+    showToast("Marked as rest day — tonight's reminder is off", 'ok');
+  }
+
+  async function pullRemoteSkips() {
+    const result = await relayFetch('/skips');
+    if (!result.ok || !Array.isArray(result.skips)) return;
+    const local = loadSkips();
+    const localDates = new Set(local.map(s => s.date));
+    const merged = [...local, ...result.skips.filter(s => !localDates.has(s.date))];
+    if (merged.length !== local.length) {
+      localStorage.setItem('gymlog_skips', JSON.stringify(merged));
+      renderWeekBanner();
+    }
+  }
+
   function loadHistory() { try { return JSON.parse(localStorage.getItem('gymlog_history')||'[]'); } catch { return []; } }
   function saveHistory(h) {
     try { localStorage.setItem('gymlog_history', JSON.stringify(h)); } catch {}
@@ -1199,6 +1313,7 @@
         return (b.id || 0) - (a.id || 0);
       });
       localStorage.setItem('gymlog_history', JSON.stringify(merged));
+      renderWeekBanner();
       if (document.getElementById('page-history').classList.contains('active')) { renderHistory(); renderBig3(); }
       renderCoreExDatalist();
     }
@@ -1231,6 +1346,7 @@
     if (!exists) history.unshift(entry);
     saveHistory(history);
     renderCoreExDatalist();
+    renderWeekBanner();
   }
 
   // Populates the core-exercise dropdown: a small baseline list plus every
