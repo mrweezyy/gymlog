@@ -275,6 +275,8 @@
     .week-banner.wb-warn { border-color: var(--border-strong); color: var(--text); }
     .week-banner.wb-danger { border-color: var(--red); color: var(--red); }
     .week-banner span { flex: 1; }
+    .streak-badge { font-family: var(--mono); font-size: 11px; color: var(--text-faint); margin: -10px 0 1.25rem 2px; }
+    .streak-badge.active { color: #e0575a; }
     .wb-skip-btn { font-size: 10px; font-family: var(--mono); padding: 5px 9px; border-radius: 8px; border: 1px solid var(--border); background: none; color: var(--text-faint); cursor: pointer; white-space: nowrap; flex-shrink: 0; }
     .wb-skip-btn:hover { border-color: var(--border-strong); color: var(--text); }
     .skip-reason-row { display: flex; flex-wrap: wrap; gap: 8px; margin: 14px 0; }
@@ -343,7 +345,7 @@
 <!-- NAVBAR -->
 <div class="navbar">
   <div class="navbar-inner">
-    <div class="logo">gym_log <span style="font-size:10px;color:var(--text-faint);font-weight:400;">v4.1</span></div>
+    <div class="logo">gym_log <span style="font-size:10px;color:var(--text-faint);font-weight:400;">v4.2</span></div>
     <div class="navbar-right">
       <button class="theme-toggle" onclick="toggleTheme()" title="toggle theme"></button>
       <button class="hamburger" onclick="openMenu()"><span></span><span></span><span></span></button>
@@ -416,6 +418,7 @@
   <!-- PAGE: LOGGER -->
   <div class="page active" id="page-logger">
     <div class="week-banner" id="weekBanner"></div>
+    <div class="streak-badge" id="streakBadge"></div>
     <div class="tg-row">
       <div class="tg-block">
         <div class="tg-status">
@@ -1236,6 +1239,22 @@
     return { count, target: WEEKLY_TARGET, daysLeft, skippedToday };
   }
 
+  // Consecutive fully-completed past weeks (excludes the current in-progress week)
+  // that hit WEEKLY_TARGET, counting backward from the most recent completed week.
+  function computeStreak(history, refDate) {
+    const { monday: curMonday } = getWeekBounds(refDate);
+    const cursor = new Date(curMonday + 'T00:00:00Z');
+    cursor.setUTCDate(cursor.getUTCDate() - 7);
+    let streak = 0;
+    while (true) {
+      const { monday, sunday } = getWeekBounds(cursor);
+      const count = history.filter(e => e.date >= monday && e.date <= sunday).length;
+      if (count >= WEEKLY_TARGET) { streak++; cursor.setUTCDate(cursor.getUTCDate() - 7); }
+      else break;
+    }
+    return streak;
+  }
+
   function renderWeekBanner() {
     const el = document.getElementById('weekBanner');
     if (!el) return;
@@ -1259,6 +1278,13 @@
     }
     el.className = 'week-banner ' + cls;
     el.innerHTML = `<span>${text}</span>` + (remaining > 0 ? `<button class="wb-skip-btn" onclick="openSkipModal()">mark rest day</button>` : '');
+
+    const streak = computeStreak(loadHistory(), new Date());
+    const badge = document.getElementById('streakBadge');
+    if (badge) {
+      badge.className = 'streak-badge' + (streak > 0 ? ' active' : '');
+      badge.textContent = streak > 0 ? `🔥 ${streak}-week streak` : '';
+    }
   }
 
   function openSkipModal()  { document.getElementById('skipModal').classList.add('open'); }
