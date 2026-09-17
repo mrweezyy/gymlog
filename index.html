@@ -282,6 +282,16 @@
     .skip-reason-row { display: flex; flex-wrap: wrap; gap: 8px; margin: 14px 0; }
     .skip-reason-btn { flex: 1; min-width: 90px; padding: 10px; font-size: 12px; font-family: var(--mono); border: 1px solid var(--border); border-radius: var(--radius); background: none; color: var(--text); cursor: pointer; }
     .skip-reason-btn:hover { border-color: var(--accent); }
+
+    /* WEEKLY PLAN */
+    .plan-row { display: flex; gap: 6px; margin-bottom: 1.25rem; }
+    .plan-day { flex: 1; padding: 8px 2px; border-radius: 10px; border: 1px solid var(--border); background: none; font-family: var(--mono); font-size: 10px; color: var(--text-faint); cursor: pointer; text-align: center; line-height: 1.5; }
+    .plan-day .pd-num { display: block; font-size: 12px; color: var(--text); }
+    .plan-day.planned { border-color: var(--accent); color: var(--accent); }
+    .plan-day.planned .pd-num { color: var(--accent); }
+    .plan-day.trained { border-color: var(--green); color: var(--green); background: rgba(76,175,80,0.08); cursor: default; }
+    .plan-day.trained .pd-num { color: var(--green); }
+    .plan-empty-note { font-family: var(--mono); font-size: 11px; color: var(--text-faint); margin: -14px 0 1.25rem 2px; }
     /* HISTORY PAGE */
     .history-toolbar { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; flex-wrap: wrap; gap: 8px; }
 
@@ -345,7 +355,7 @@
 <!-- NAVBAR -->
 <div class="navbar">
   <div class="navbar-inner">
-    <div class="logo">gym_log <span style="font-size:10px;color:var(--text-faint);font-weight:400;">v4.2</span></div>
+    <div class="logo">gym_log <span style="font-size:10px;color:var(--text-faint);font-weight:400;">v4.3</span></div>
     <div class="navbar-right">
       <button class="theme-toggle" onclick="toggleTheme()" title="toggle theme"></button>
       <button class="hamburger" onclick="openMenu()"><span></span><span></span><span></span></button>
@@ -419,6 +429,8 @@
   <div class="page active" id="page-logger">
     <div class="week-banner" id="weekBanner"></div>
     <div class="streak-badge" id="streakBadge"></div>
+    <div class="plan-row" id="planRow"></div>
+    <div class="plan-empty-note" id="planEmptyNote" style="display:none;">Tap the days above you actually plan to train this week — reminders only fire on those days.</div>
     <div class="tg-row">
       <div class="tg-block">
         <div class="tg-status">
@@ -666,9 +678,11 @@
     renderCoreExDatalist();
     renderMGLegend('mgLegendLog');
     renderWeekBanner();
+    renderPlanRow();
 
     initRemoteSync();
     pullRemoteSkips();
+    pullRemotePlan();
 
     // Auto-save on any input change in the logger
     document.getElementById('page-logger').addEventListener('input', saveSession);
@@ -1255,6 +1269,62 @@
     return streak;
   }
 
+  /* WEEKLY PLAN — which specific days this week you actually intend to train.
+     Reminders only fire on days tagged here, so the system stops guessing. */
+  function loadPlannedDates() { try { return JSON.parse(localStorage.getItem('gymlog_planned_dates')||'[]'); } catch { return []; } }
+  function savePlannedDates(arr) {
+    try { localStorage.setItem('gymlog_planned_dates', JSON.stringify(arr)); } catch {}
+    relayFetch('/plan', { method: 'PUT', body: JSON.stringify(arr) });
+  }
+
+  function togglePlanDay(dateStr) {
+    const planned = loadPlannedDates();
+    const idx = planned.indexOf(dateStr);
+    if (idx === -1) planned.push(dateStr); else planned.splice(idx, 1);
+    savePlannedDates(planned);
+    renderPlanRow();
+  }
+
+  function renderPlanRow() {
+    const el = document.getElementById('planRow');
+    const note = document.getElementById('planEmptyNote');
+    if (!el) return;
+    const now = new Date();
+    const { monday } = getWeekBounds(now);
+    const mondayDate = new Date(monday + 'T00:00:00Z');
+    const planned = new Set(loadPlannedDates());
+    const trainedDates = new Set(loadHistory().map(e => e.date));
+    const dayLabels = ['M','T','W','T','F','S','S'];
+    const todayStr = isoDateStr(now);
+
+    let html = '';
+    let plannedThisWeekCount = 0;
+    for (let i = 0; i < 7; i++) {
+      const d = new Date(mondayDate);
+      d.setUTCDate(mondayDate.getUTCDate() + i);
+      const dStr = isoDateStr(d);
+      const isTrained = trainedDates.has(dStr);
+      const isPlanned = planned.has(dStr) || isTrained;
+      if (planned.has(dStr)) plannedThisWeekCount++;
+      const cls = isTrained ? 'trained' : (isPlanned ? 'planned' : '');
+      const todayMark = dStr === todayStr ? 'text-decoration:underline;' : '';
+      html += `<button class="plan-day ${cls}" style="${todayMark}" onclick="${isTrained ? '' : `togglePlanDay('${dStr}')`}">${dayLabels[i]}<span class="pd-num">${d.getUTCDate()}</span></button>`;
+    }
+    el.innerHTML = html;
+    if (note) note.style.display = plannedThisWeekCount === 0 ? 'block' : 'none';
+  }
+
+  async function pullRemotePlan() {
+    const result = await relayFetch('/plan');
+    if (!result.ok || !Array.isArray(result.plan)) return;
+    const local = loadPlannedDates();
+    const merged = [...new Set([...local, ...result.plan])];
+    if (merged.length !== local.length) {
+      localStorage.setItem('gymlog_planned_dates', JSON.stringify(merged));
+      renderPlanRow();
+    }
+  }
+
   function renderWeekBanner() {
     const el = document.getElementById('weekBanner');
     if (!el) return;
@@ -1297,6 +1367,7 @@
     saveSkips(skips);
     closeSkipModal();
     renderWeekBanner();
+    renderPlanRow();
     showToast("Marked as rest day — tonight's reminder is off", 'ok');
   }
 
@@ -1373,6 +1444,7 @@
     saveHistory(history);
     renderCoreExDatalist();
     renderWeekBanner();
+    renderPlanRow();
   }
 
   // Populates the core-exercise dropdown: a small baseline list plus every
