@@ -87,8 +87,8 @@
     .section-chevron.collapsed { transform: rotate(-90deg); }
     .section-body { overflow: hidden; max-height: 99999px; transition: max-height 0.35s ease, opacity 0.25s ease; opacity: 1; }
     .section-body.collapsed { max-height: 0; opacity: 0; pointer-events: none; }
-    input[type=text], input[type=number], textarea { font-family: var(--sans); font-size: 14px; color: var(--text); background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 9px 12px; width: 100%; transition: border-color 0.15s, background 0.2s; }
-    input[type=text]:focus, input[type=number]:focus, textarea:focus { outline: none; border-color: var(--border-strong); }
+    input[type=text], input[type=number], input[type=date], textarea { font-family: var(--sans); font-size: 14px; color: var(--text); background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 9px 12px; width: 100%; transition: border-color 0.15s, background 0.2s; }
+    input[type=text]:focus, input[type=number]:focus, input[type=date]:focus, textarea:focus { outline: none; border-color: var(--border-strong); }
     textarea { resize: none; line-height: 1.5; }
     .add-any-btn { width: 100%; padding: 11px; font-size: 13px; font-family: var(--mono); color: var(--text); background: none; border: 1px dashed var(--border-strong); border-radius: var(--radius-lg); cursor: pointer; margin-bottom: 1.5rem; }
     .add-any-btn:hover { border-color: var(--border-strong); color: var(--text); background: var(--surface); }
@@ -277,11 +277,10 @@
     .week-banner span { flex: 1; }
     .streak-badge { font-family: var(--mono); font-size: 11px; color: var(--text-faint); margin: -10px 0 1.25rem 2px; }
     .streak-badge.active { color: #e0575a; }
-    .wb-skip-btn { font-size: 10px; font-family: var(--mono); padding: 5px 9px; border-radius: 8px; border: 1px solid var(--border); background: none; color: var(--text-faint); cursor: pointer; white-space: nowrap; flex-shrink: 0; }
-    .wb-skip-btn:hover { border-color: var(--border-strong); color: var(--text); }
-    .skip-reason-row { display: flex; flex-wrap: wrap; gap: 8px; margin: 14px 0; }
-    .skip-reason-btn { flex: 1; min-width: 90px; padding: 10px; font-size: 12px; font-family: var(--mono); border: 1px solid var(--border); border-radius: var(--radius); background: none; color: var(--text); cursor: pointer; }
-    .skip-reason-btn:hover { border-color: var(--accent); }
+    .cycle-dates-row { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin: -14px 0 1.25rem 2px; }
+    .cycle-dates-row span { font-family: var(--mono); font-size: 11px; color: var(--text-faint); }
+    .cycle-fix-btn { font-size: 10px; font-family: var(--mono); padding: 3px 8px; border-radius: 8px; border: 1px solid var(--border); background: none; color: var(--text-faint); cursor: pointer; white-space: nowrap; }
+    .cycle-fix-btn:hover { border-color: var(--border-strong); color: var(--text); }
 
     /* WEEKLY PLAN */
     .plan-row { display: flex; gap: 6px; margin-bottom: 1.25rem; }
@@ -355,7 +354,7 @@
 <!-- NAVBAR -->
 <div class="navbar">
   <div class="navbar-inner">
-    <div class="logo">gym_log <span style="font-size:10px;color:var(--text-faint);font-weight:400;">v4.3</span></div>
+    <div class="logo">gym_log <span style="font-size:10px;color:var(--text-faint);font-weight:400;">v4.7</span></div>
     <div class="navbar-right">
       <button class="theme-toggle" onclick="toggleTheme()" title="toggle theme"></button>
       <button class="hamburger" onclick="openMenu()"><span></span><span></span><span></span></button>
@@ -389,18 +388,15 @@
   </div>
 </div>
 
-<!-- SKIP DAY MODAL -->
-<div class="modal-overlay" id="skipModal">
+<!-- CYCLE START FIX MODAL -->
+<div class="modal-overlay" id="cycleStartModal">
   <div class="modal">
-    <p>Mark today as a rest day?</p>
-    <p style="font-size:12px;color:var(--text-faint);margin-top:6px;">Only for genuine reasons. This turns off tonight's reminder — it doesn't lower your weekly target of <span id="skipTargetNum"></span>.</p>
-    <div class="skip-reason-row">
-      <button class="skip-reason-btn" onclick="confirmSkip('sick')">sick</button>
-      <button class="skip-reason-btn" onclick="confirmSkip('travel')">traveling</button>
-      <button class="skip-reason-btn" onclick="confirmSkip('busy')">genuinely busy</button>
-    </div>
-    <div class="modal-btns">
-      <button class="modal-cancel" onclick="closeSkipModal()">cancel</button>
+    <p>Fix this cycle's start date</p>
+    <p style="font-size:12px;color:var(--text-faint);margin:6px 0 12px;">Only changes your current cycle — closed cycles and your streak history stay as they are.</p>
+    <input type="date" id="cycleStartInput">
+    <div class="modal-btns" style="margin-top:12px;">
+      <button class="modal-cancel" onclick="closeCycleStartModal()">cancel</button>
+      <button class="modal-confirm" style="background:var(--accent);color:var(--accent-fg);" onclick="confirmCycleStart()">save</button>
     </div>
   </div>
 </div>
@@ -428,9 +424,13 @@
   <!-- PAGE: LOGGER -->
   <div class="page active" id="page-logger">
     <div class="week-banner" id="weekBanner"></div>
+    <div class="cycle-dates-row" id="cycleDatesRow" style="display:none;">
+      <span id="cycleDatesText"></span>
+      <button class="cycle-fix-btn" onclick="openCycleStartModal()">fix start date</button>
+    </div>
     <div class="streak-badge" id="streakBadge"></div>
     <div class="plan-row" id="planRow"></div>
-    <div class="plan-empty-note" id="planEmptyNote" style="display:none;">Tap the days above you actually plan to train this week — reminders only fire on those days.</div>
+    <div class="plan-empty-note" id="planEmptyNote" style="display:none;">Tap the days above you actually plan to train — reminders only fire on those days.</div>
     <div class="tg-row">
       <div class="tg-block">
         <div class="tg-status">
@@ -463,6 +463,10 @@
       <div class="slabel">session</div>
       <input type="text" id="workoutName" placeholder="push day, legs, pull…" style="margin-bottom:8px;">
       <textarea id="sessionNotes" rows="2" placeholder="session notes (optional)"></textarea>
+      <label style="display:flex;align-items:center;gap:8px;margin-top:8px;font-size:13px;color:var(--text-faint);cursor:pointer;">
+        <input type="checkbox" id="countTowardCycle" checked style="width:auto;margin:0;">
+        count toward cycle
+      </label>
     </div>
 
     <hr class="divider">
@@ -539,7 +543,8 @@
 
 <script>
   const RELAY_URL = 'https://gymlog-relay.mrweezy.workers.dev';
-  const WEEKLY_TARGET = 3; // sessions/week — must match the target hardcoded in the Worker's cron logic
+  const WEEKLY_TARGET = 3; // sessions needed within each 7-day cycle — must match the Worker's CYCLE_TARGET
+  const CYCLE_LEN_DAYS = 7; // length of one rolling cycle
   const MAX_CORE_SETS = 3;
   const BIG3 = ['squat','bench press','deadlift'];
 
@@ -576,6 +581,7 @@
       const session = {
         workoutName: document.getElementById('workoutName').value,
         sessionNotes: document.getElementById('sessionNotes').value,
+        countTowardCycle: document.getElementById('countTowardCycle').checked,
         mains, cardios, cores, uid, overrideDate
       };
       localStorage.setItem('gymlog_session', JSON.stringify(session));
@@ -589,6 +595,7 @@
       const session = JSON.parse(raw);
       document.getElementById('workoutName').value = session.workoutName || '';
       document.getElementById('sessionNotes').value = session.sessionNotes || '';
+      document.getElementById('countTowardCycle').checked = session.countTowardCycle !== false;
       mains = session.mains || [];
       cardios = (session.cardios || []).map(e=>({km:'', ...e}));
       cores = session.cores || [];
@@ -681,8 +688,8 @@
     renderPlanRow();
 
     initRemoteSync();
-    pullRemoteSkips();
     pullRemotePlan();
+    pullRemoteCycleOverride();
 
     // Auto-save on any input change in the logger
     document.getElementById('page-logger').addEventListener('input', saveSession);
@@ -693,6 +700,7 @@
 
   /* PAGES */
   function switchPage(id) {
+    window.scrollTo(0, 0);
     document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
     document.getElementById('page-'+id).classList.add('active');
     ['logger','history','workouts'].forEach(n=>{
@@ -747,6 +755,7 @@
     closeModal();
     document.getElementById('workoutName').value='';
     document.getElementById('sessionNotes').value='';
+    document.getElementById('countTowardCycle').checked = true;
     mains=[]; cardios=[]; cores=[]; uid=0;
     overrideDate = null;
     renderDateStr();
@@ -1221,56 +1230,119 @@
 
 
   /* HISTORY */
-  /* WEEK PROGRESS + REST-DAY TAGGING */
+  /* CYCLE PROGRESS — not a calendar week. A "cycle" is a rolling 7-day window
+     that starts the moment you log your first workout after the previous
+     cycle closed. Nothing carries over between cycles — a fresh box every
+     time, no debt. The streak only continues if cycles are back-to-back with
+     zero gap, which is what stops "skip weeks then cram" from counting. */
   function isoDateStr(d) { return d.toISOString().slice(0,10); }
+  function addDays(dateStr, n) { const d = new Date(dateStr + 'T00:00:00Z'); d.setUTCDate(d.getUTCDate() + n); return isoDateStr(d); }
 
-  function getWeekBounds(d) {
-    // Monday–Sunday bounds (UTC-day arithmetic, matching how history dates are stamped via toISOString)
-    const day = d.getUTCDay(); // 0=Sun..6=Sat
-    const diffToMonday = (day === 0 ? -6 : 1 - day);
-    const monday = new Date(d);
-    monday.setUTCDate(d.getUTCDate() + diffToMonday);
-    monday.setUTCHours(0,0,0,0);
-    const sunday = new Date(monday);
-    sunday.setUTCDate(monday.getUTCDate() + 6);
-    return { monday: isoDateStr(monday), sunday: isoDateStr(sunday) };
+  function buildCycles(history, override) {
+    const dates = [...new Set(history.map(e => e.date))].sort();
+    const cycles = [];
+    let i = 0;
+    while (i < dates.length) {
+      const start = dates[i];
+      const end = addDays(start, CYCLE_LEN_DAYS - 1);
+      let count = 0;
+      while (i < dates.length && dates[i] <= end) { count++; i++; }
+      cycles.push({ start, end, count, success: count >= WEEKLY_TARGET });
+    }
+    // Manual correction, if set: only applies while no workout has been
+    // logged past the corrected cycle's end — i.e. it self-expires the
+    // moment a real new cycle naturally begins, so it can never leak onto
+    // a cycle it wasn't meant to correct.
+    if (override && cycles.length) {
+      const lastDate = dates[dates.length - 1];
+      if (lastDate <= override.end) {
+        const newEnd = addDays(override.start, CYCLE_LEN_DAYS - 1);
+        const newCount = dates.filter(d => d >= override.start && d <= newEnd).length;
+        cycles[cycles.length - 1] = { start: override.start, end: newEnd, count: newCount, success: newCount >= WEEKLY_TARGET };
+      }
+    }
+    return cycles;
   }
 
-  function loadSkips() { try { return JSON.parse(localStorage.getItem('gymlog_skips')||'[]'); } catch { return []; } }
-  function saveSkips(arr) {
-    try { localStorage.setItem('gymlog_skips', JSON.stringify(arr)); } catch {}
-    relayFetch('/skips', { method: 'PUT', body: JSON.stringify(arr) });
+  // The cycle currently in progress as of todayStr — null if there isn't one
+  // (never trained, or last cycle closed and nothing new has started yet).
+  function getCurrentCycle(history, todayStr, override) {
+    const cycles = buildCycles(history, override);
+    if (!cycles.length) return null;
+    const last = cycles[cycles.length - 1];
+    if (last.end < todayStr) return null;
+    const daysLeft = Math.round((new Date(last.end+'T00:00:00Z') - new Date(todayStr+'T00:00:00Z')) / 86400000) + 1;
+    return { start: last.start, end: last.end, count: last.count, daysLeft };
   }
 
-  function computeWeekProgress() {
-    const now = new Date();
-    const { monday, sunday } = getWeekBounds(now);
-    const count = loadHistory().filter(e => e.date >= monday && e.date <= sunday).length;
-    const todayStr = isoDateStr(now);
-    const skippedToday = loadSkips().some(s => s.date === todayStr);
-    const dow = now.getUTCDay() === 0 ? 7 : now.getUTCDay(); // 1..7, Mon..Sun
-    const daysLeft = 7 - dow + 1; // includes today
-    return { count, target: WEEKLY_TARGET, daysLeft, skippedToday };
-  }
-
-  // Consecutive fully-completed past weeks (excludes the current in-progress week)
-  // that hit WEEKLY_TARGET, counting backward from the most recent completed week.
-  function computeStreak(history, refDate) {
-    const { monday: curMonday } = getWeekBounds(refDate);
-    const cursor = new Date(curMonday + 'T00:00:00Z');
-    cursor.setUTCDate(cursor.getUTCDate() - 7);
-    let streak = 0;
-    while (true) {
-      const { monday, sunday } = getWeekBounds(cursor);
-      const count = history.filter(e => e.date >= monday && e.date <= sunday).length;
-      if (count >= WEEKLY_TARGET) { streak++; cursor.setUTCDate(cursor.getUTCDate() - 7); }
-      else break;
+  // Consecutive successful cycles chained with zero gap between them, up to
+  // (not including) any cycle that hasn't closed yet as of todayStr.
+  function computeStreak(history, todayStr, override) {
+    const cycles = buildCycles(history, override);
+    let streak = 0, chainActive = false, prevEnd = null;
+    for (const c of cycles) {
+      if (c.end >= todayStr) break;
+      if (c.success) { streak = (chainActive && c.start === addDays(prevEnd, 1)) ? streak + 1 : 1; chainActive = true; }
+      else { streak = 0; chainActive = false; }
+      prevEnd = c.end;
     }
     return streak;
   }
 
-  /* WEEKLY PLAN — which specific days this week you actually intend to train.
-     Reminders only fire on days tagged here, so the system stops guessing. */
+  /* Manual correction for the current cycle's start date — for when the
+     auto-detected day 1 was wrong. Self-expiring (see buildCycles above),
+     so it never needs manual cleanup once it's no longer relevant. */
+  function loadCycleOverride() { try { return JSON.parse(localStorage.getItem('gymlog_cycle_override')||'null'); } catch { return null; } }
+  function saveCycleOverride(ov) {
+    try { localStorage.setItem('gymlog_cycle_override', JSON.stringify(ov)); } catch {}
+    relayFetch('/cycle-override', { method: 'PUT', body: JSON.stringify(ov) });
+  }
+
+  function openCycleStartModal() {
+    const todayStr = isoDateStr(new Date());
+    const override = loadCycleOverride();
+    const cycles = buildCycles(loadHistory(), override);
+    const current = cycles.length ? cycles[cycles.length - 1] : null;
+    document.getElementById('cycleStartInput').value = current ? current.start : todayStr;
+    document.getElementById('cycleStartInput').max = todayStr;
+    document.getElementById('cycleStartModal').classList.add('open');
+  }
+  function closeCycleStartModal() { document.getElementById('cycleStartModal').classList.remove('open'); }
+
+  function confirmCycleStart() {
+    const newStart = document.getElementById('cycleStartInput').value;
+    const todayStr = isoDateStr(new Date());
+    if (!newStart) return;
+    if (newStart > todayStr) { showToast("Can't set a start date in the future", 'err'); return; }
+
+    const history = loadHistory();
+    const cycles = buildCycles(history, loadCycleOverride());
+    if (cycles.length > 1) {
+      const prevEnd = cycles[cycles.length - 2].end;
+      if (newStart <= prevEnd) { showToast('That overlaps your previous cycle', 'err'); return; }
+    }
+
+    const override = { start: newStart, end: addDays(newStart, CYCLE_LEN_DAYS - 1) };
+    saveCycleOverride(override);
+    closeCycleStartModal();
+    renderWeekBanner();
+    showToast('Cycle start updated', 'ok');
+  }
+
+  async function pullRemoteCycleOverride() {
+    const result = await relayFetch('/cycle-override');
+    if (!result.ok) return;
+    const remote = result.override || null;
+    const local = loadCycleOverride();
+    if (JSON.stringify(remote) !== JSON.stringify(local)) {
+      try { localStorage.setItem('gymlog_cycle_override', JSON.stringify(remote)); } catch {}
+      renderWeekBanner();
+    }
+  }
+
+  /* PLAN — which of the next 7 days (rolling from today) you intend to
+     train. Purely a convenience for gating reminders; independent of the
+     cycle/streak math above, which only ever looks at actual workout dates. */
   function loadPlannedDates() { try { return JSON.parse(localStorage.getItem('gymlog_planned_dates')||'[]'); } catch { return []; } }
   function savePlannedDates(arr) {
     try { localStorage.setItem('gymlog_planned_dates', JSON.stringify(arr)); } catch {}
@@ -1290,28 +1362,25 @@
     const note = document.getElementById('planEmptyNote');
     if (!el) return;
     const now = new Date();
-    const { monday } = getWeekBounds(now);
-    const mondayDate = new Date(monday + 'T00:00:00Z');
+    const todayStr = isoDateStr(now);
     const planned = new Set(loadPlannedDates());
     const trainedDates = new Set(loadHistory().map(e => e.date));
     const dayLabels = ['M','T','W','T','F','S','S'];
-    const todayStr = isoDateStr(now);
 
     let html = '';
-    let plannedThisWeekCount = 0;
+    let plannedCount = 0;
     for (let i = 0; i < 7; i++) {
-      const d = new Date(mondayDate);
-      d.setUTCDate(mondayDate.getUTCDate() + i);
-      const dStr = isoDateStr(d);
+      const dStr = addDays(todayStr, i);
+      const d = new Date(dStr + 'T00:00:00Z');
       const isTrained = trainedDates.has(dStr);
       const isPlanned = planned.has(dStr) || isTrained;
-      if (planned.has(dStr)) plannedThisWeekCount++;
+      if (planned.has(dStr)) plannedCount++;
       const cls = isTrained ? 'trained' : (isPlanned ? 'planned' : '');
-      const todayMark = dStr === todayStr ? 'text-decoration:underline;' : '';
-      html += `<button class="plan-day ${cls}" style="${todayMark}" onclick="${isTrained ? '' : `togglePlanDay('${dStr}')`}">${dayLabels[i]}<span class="pd-num">${d.getUTCDate()}</span></button>`;
+      const todayMark = i === 0 ? 'text-decoration:underline;' : '';
+      html += `<button class="plan-day ${cls}" style="${todayMark}" onclick="${isTrained ? '' : `togglePlanDay('${dStr}')`}">${dayLabels[d.getUTCDay()===0?6:d.getUTCDay()-1]}<span class="pd-num">${d.getUTCDate()}</span></button>`;
     }
     el.innerHTML = html;
-    if (note) note.style.display = plannedThisWeekCount === 0 ? 'block' : 'none';
+    if (note) note.style.display = plannedCount === 0 ? 'block' : 'none';
   }
 
   async function pullRemotePlan() {
@@ -1328,58 +1397,49 @@
   function renderWeekBanner() {
     const el = document.getElementById('weekBanner');
     if (!el) return;
-    document.getElementById('skipTargetNum').textContent = WEEKLY_TARGET;
-    const { count, target, daysLeft, skippedToday } = computeWeekProgress();
-    const remaining = Math.max(0, target - count);
-    const dayWord = n => `${n} day${n===1?'':'s'}`;
+    const now = new Date();
+    const todayStr = isoDateStr(now);
+    const override = loadCycleOverride();
+    const history = loadHistory();
+    const cycle = getCurrentCycle(history, todayStr, override);
     let cls, text;
-    if (remaining === 0) {
-      cls = 'wb-ok';
-      text = `✅ ${count}/${target} done this week — you're set`;
-    } else if (skippedToday) {
+    if (!cycle) {
       cls = 'wb-warn';
-      text = `${count}/${target} this week · today's marked as rest · ${remaining} still needed, ${dayWord(daysLeft)} left`;
-    } else if (remaining >= daysLeft) {
-      cls = 'wb-danger';
-      text = `⚠ ${count}/${target} this week · ${remaining} needed in ${dayWord(daysLeft)} left`;
+      text = `No active cycle — your next workout starts a fresh 7-day window`;
     } else {
-      cls = 'wb-warn';
-      text = `${count}/${target} this week · ${remaining} more needed · ${dayWord(daysLeft)} left`;
+      const remaining = Math.max(0, WEEKLY_TARGET - cycle.count);
+      const dayWord = n => `${n} day${n===1?'':'s'}`;
+      if (remaining === 0) {
+        cls = 'wb-ok';
+        text = `✅ ${cycle.count}/${WEEKLY_TARGET} done this cycle — you're set`;
+      } else if (remaining >= cycle.daysLeft) {
+        cls = 'wb-danger';
+        text = `⚠ ${cycle.count}/${WEEKLY_TARGET} this cycle · ${remaining} needed in ${dayWord(cycle.daysLeft)} left`;
+      } else {
+        cls = 'wb-warn';
+        text = `${cycle.count}/${WEEKLY_TARGET} this cycle · ${remaining} more needed · ${dayWord(cycle.daysLeft)} left`;
+      }
     }
     el.className = 'week-banner ' + cls;
-    el.innerHTML = `<span>${text}</span>` + (remaining > 0 ? `<button class="wb-skip-btn" onclick="openSkipModal()">mark rest day</button>` : '');
+    el.innerHTML = `<span>${text}</span>`;
 
-    const streak = computeStreak(loadHistory(), new Date());
+    const cycles = buildCycles(history, override);
+    const datesRow = document.getElementById('cycleDatesRow');
+    if (datesRow) {
+      if (cycles.length) {
+        const last = cycles[cycles.length - 1];
+        document.getElementById('cycleDatesText').textContent = `Cycle: ${last.start} → ${last.end}`;
+        datesRow.style.display = 'flex';
+      } else {
+        datesRow.style.display = 'none';
+      }
+    }
+
+    const streak = computeStreak(history, todayStr, override);
     const badge = document.getElementById('streakBadge');
     if (badge) {
       badge.className = 'streak-badge' + (streak > 0 ? ' active' : '');
-      badge.textContent = streak > 0 ? `🔥 ${streak}-week streak` : '';
-    }
-  }
-
-  function openSkipModal()  { document.getElementById('skipModal').classList.add('open'); }
-  function closeSkipModal() { document.getElementById('skipModal').classList.remove('open'); }
-
-  function confirmSkip(reason) {
-    const todayStr = isoDateStr(new Date());
-    const skips = loadSkips().filter(s => s.date !== todayStr); // one tag per day, latest wins
-    skips.unshift({ date: todayStr, reason });
-    saveSkips(skips);
-    closeSkipModal();
-    renderWeekBanner();
-    renderPlanRow();
-    showToast("Marked as rest day — tonight's reminder is off", 'ok');
-  }
-
-  async function pullRemoteSkips() {
-    const result = await relayFetch('/skips');
-    if (!result.ok || !Array.isArray(result.skips)) return;
-    const local = loadSkips();
-    const localDates = new Set(local.map(s => s.date));
-    const merged = [...local, ...result.skips.filter(s => !localDates.has(s.date))];
-    if (merged.length !== local.length) {
-      localStorage.setItem('gymlog_skips', JSON.stringify(merged));
-      renderWeekBanner();
+      badge.textContent = streak > 0 ? `🔥 ${streak}-cycle streak` : '';
     }
   }
 
@@ -1426,13 +1486,15 @@
     const history = loadHistory();
     const dateStr = logDate.toISOString().slice(0,10);
     const name = document.getElementById('workoutName').value.trim() || 'Workout';
+    const countToggle = document.getElementById('countTowardCycle');
     const entry = {
       id: Date.now(),
       date: dateStr,
       name,
       mains: JSON.parse(JSON.stringify(mains)),
       cardios: JSON.parse(JSON.stringify(cardios)),
-      cores: JSON.parse(JSON.stringify(cores))
+      cores: JSON.parse(JSON.stringify(cores)),
+      excludeFromCycle: countToggle ? !countToggle.checked : false
     };
     // Only skip if this is a true duplicate (same date, name, AND content) —
     // e.g. a double-tap on send. Two genuinely different workouts on the same
