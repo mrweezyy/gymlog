@@ -2,7 +2,10 @@
 <html lang="en" data-theme="light">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="theme-color" id="themeColorMeta" content="#f1efe9">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <title>gym log</title>
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 100 100%27%3E%3Ctext y=%27.9em%27 font-size=%2790%27%3E%F0%9F%92%AA%3C/text%3E%3C/svg%3E">
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -28,7 +31,10 @@
       --accent: #c084fc; --accent-fg: #100d1a; --green: #34d399; --red: #f87171;
       --bg-card: #1a1528;
     }
-    body { font-family: var(--sans); color: var(--text); min-height: 100vh; padding: 0 0 4rem; transition: background 0.5s, color 0.2s; background: linear-gradient(155deg,#ffffff 0%,#f1efe9 55%,#e6e3da 100%); background-attachment: fixed; }
+    html { background: #e6e3da; }
+    [data-theme="dark"] html { background: #000000; }
+    [data-theme="purple"] html { background: #141418; }
+    body { font-family: var(--sans); color: var(--text); min-height: 100vh; padding: 0 0 calc(4rem + env(safe-area-inset-bottom, 0px)); transition: background 0.5s, color 0.2s; background: linear-gradient(155deg,#ffffff 0%,#f1efe9 55%,#e6e3da 100%); background-attachment: fixed; }
     [data-theme="dark"] body { background: linear-gradient(155deg,#3a3a36 0%,#1a1a18 50%,#000000 100%); background-attachment: fixed; }
     [data-theme="purple"] body { background: linear-gradient(160deg, #2a1a4a 0%, #1a1030 30%, #0e0e14 65%, #141418 100%); background-attachment: fixed; }
     .app { max-width: 580px; margin: 0 auto; padding: 0 1rem; }
@@ -354,7 +360,7 @@
 <!-- NAVBAR -->
 <div class="navbar">
   <div class="navbar-inner">
-    <div class="logo">gym_log <span style="font-size:10px;color:var(--text-faint);font-weight:400;">v4.7</span></div>
+    <div class="logo">gym_log <span style="font-size:10px;color:var(--text-faint);font-weight:400;">v4.8</span></div>
     <div class="navbar-right">
       <button class="theme-toggle" onclick="toggleTheme()" title="toggle theme"></button>
       <button class="hamburger" onclick="openMenu()"><span></span><span></span><span></span></button>
@@ -677,6 +683,7 @@
     const s = getSaved();
     document.getElementById('relaySecret').value = s.relaySecret || '';
     document.documentElement.setAttribute('data-theme', localStorage.getItem('gymlog_theme')||'light');
+    updateThemeColorMeta(localStorage.getItem('gymlog_theme')||'light');
     updateDot();
     const restored = restoreSession();
     renderDateStr();
@@ -725,11 +732,17 @@
   function closeMenu() { document.getElementById('sideMenu').classList.remove('open'); document.getElementById('menuOverlay').classList.remove('open'); }
 
   /* THEME */
+  const THEME_COLORS = { light: '#e6e3da', dark: '#000000', purple: '#141418' };
+  function updateThemeColorMeta(theme) {
+    const meta = document.getElementById('themeColorMeta');
+    if (meta) meta.setAttribute('content', THEME_COLORS[theme] || THEME_COLORS.light);
+  }
   function toggleTheme() {
     const current = document.documentElement.getAttribute('data-theme');
     const next = current === 'light' ? 'dark' : current === 'dark' ? 'purple' : 'light';
     document.documentElement.setAttribute('data-theme', next);
     localStorage.setItem('gymlog_theme', next);
+    updateThemeColorMeta(next);
   }
 
   /* CONFIG */
