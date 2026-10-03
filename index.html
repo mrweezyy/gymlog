@@ -363,7 +363,7 @@
 <!-- NAVBAR -->
 <div class="navbar">
   <div class="navbar-inner">
-    <div class="logo">gym_log <span style="font-size:10px;color:var(--text-faint);font-weight:400;">v5.10</span></div>
+    <div class="logo">gym_log <span style="font-size:10px;color:var(--text-faint);font-weight:400;">v5.11</span></div>
     <div class="navbar-right">
       <button class="theme-toggle" onclick="toggleTheme()" title="toggle theme"></button>
       <button class="hamburger" onclick="openMenu()"><span></span><span></span><span></span></button>
@@ -662,7 +662,7 @@
   }
 
   function confirmDateEdit() {
-    const todayStr = new Date().toISOString().slice(0,10);
+    const todayStr = localDateStr(new Date());
     const draftStr = draftDate.getFullYear() + '-' + String(draftDate.getMonth()+1).padStart(2,'0') + '-' + String(draftDate.getDate()).padStart(2,'0');
     overrideDate = (draftStr === todayStr) ? null : draftStr;
     document.getElementById('dateEditor').style.display = 'none';
@@ -1252,6 +1252,9 @@
      time, no debt. The streak only continues if cycles are back-to-back with
      zero gap, which is what stops "skip weeks then cram" from counting. */
   function isoDateStr(d) { return d.toISOString().slice(0,10); }
+  // Calendar date in the phone's own timezone. Use this for "today" and for the
+  // date a workout is logged under; isoDateStr() is UTC and is only for date math.
+  function localDateStr(d) { return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0'); }
   function addDays(dateStr, n) { const d = new Date(dateStr + 'T00:00:00Z'); d.setUTCDate(d.getUTCDate() + n); return isoDateStr(d); }
 
   function buildCycles(history, override) {
@@ -1315,7 +1318,7 @@
   }
 
   function openCycleStartModal() {
-    const todayStr = isoDateStr(new Date());
+    const todayStr = localDateStr(new Date());
     const override = loadCycleOverride();
     const cycles = buildCycles(loadHistory(), override);
     const current = cycles.length ? cycles[cycles.length - 1] : null;
@@ -1327,7 +1330,7 @@
 
   function confirmCycleStart() {
     const newStart = document.getElementById('cycleStartInput').value;
-    const todayStr = isoDateStr(new Date());
+    const todayStr = localDateStr(new Date());
     if (!newStart) return;
     if (newStart > todayStr) { showToast("Can't set a start date in the future", 'err'); return; }
 
@@ -1378,7 +1381,7 @@
     const note = document.getElementById('planEmptyNote');
     if (!el) return;
     const now = new Date();
-    const todayStr = isoDateStr(now);
+    const todayStr = localDateStr(now);
     const planned = new Set(loadPlannedDates());
     const trainedDates = new Set(loadHistory().map(e => e.date));
     const dayLabels = ['M','T','W','T','F','S','S'];
@@ -1414,7 +1417,7 @@
     const el = document.getElementById('weekBanner');
     if (!el) return;
     const now = new Date();
-    const todayStr = isoDateStr(now);
+    const todayStr = localDateStr(now);
     const override = loadCycleOverride();
     const history = loadHistory();
     const cycle = getCurrentCycle(history, todayStr, override);
@@ -1500,7 +1503,7 @@
   function saveWorkoutToHistory(logDate) {
     if (!mains.length && !cardios.length && !cores.length) return;
     const history = loadHistory();
-    const dateStr = logDate.toISOString().slice(0,10);
+    const dateStr = localDateStr(logDate);
     const name = document.getElementById('workoutName').value.trim() || 'Workout';
     const countToggle = document.getElementById('countTowardCycle');
     const entry = {
