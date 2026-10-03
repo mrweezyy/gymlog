@@ -363,7 +363,7 @@
 <!-- NAVBAR -->
 <div class="navbar">
   <div class="navbar-inner">
-    <div class="logo">gym_log <span style="font-size:10px;color:var(--text-faint);font-weight:400;">v5.13</span></div>
+    <div class="logo">gym_log <span style="font-size:10px;color:var(--text-faint);font-weight:400;">v5.14</span></div>
     <div class="navbar-right">
       <button class="theme-toggle" onclick="toggleTheme()" title="toggle theme"></button>
       <button class="hamburger" onclick="openMenu()"><span></span><span></span><span></span></button>
@@ -937,6 +937,14 @@
     return String(v).replace(/[_*\[\]()~`>#+\-=|{}.!\\]/g, '\\$&');
   }
 
+  // Notes can contain line breaks. Inside a quote every line must start with '>'
+  // and an italic can't span lines, so each note line gets its own italic line.
+  function noteLines(note) {
+    return String(note || '').split(/\r?\n/).map(l => l.trim()).filter(Boolean).map(l => `  _${mdEsc(l)}_`);
+  }
+  // Single-line text (names) must never contain a line break inside a quote.
+  function mdEscLine(v) { return mdEsc(String(v).replace(/\s*[\r\n]+\s*/g, ' ').trim()); }
+
   // Wraps a set of already-formatted lines into a single MarkdownV2
   // expandable blockquote: collapsed to its first line by default, with
   // a "Show more" the reader taps to reveal the rest.
@@ -961,23 +969,23 @@
     if(hasMain){
       const lines=['🏋️ *Exercises*'];
       mains.filter(e=>e.name.trim()).forEach((ex,i)=>{
-        lines.push(`*${i+1}\\. ${mdEsc(ex.name)}*`);
+        lines.push(`*${i+1}\\. ${mdEscLine(ex.name)}*`);
         ex.sets.forEach((s,si)=>{
           const reps=mdEsc(s.reps||'—'),kg=s.weight?`${mdEsc(s.weight)} kg`:'—',feel=s.diff?` ${diffEmoji[s.diff]} ${diffText[s.diff]}`:'';
           lines.push(`  Set ${si+1}: ${reps} reps × ${kg}${feel}`);
         });
-        if(ex.notes.trim()) lines.push(`  _${mdEsc(ex.notes.trim())}_`);
+        noteLines(ex.notes).forEach(l=>lines.push(l));
       });
       msg += '\n\n' + toExpandableQuote(lines);
     }
     if(hasCardio){
       const lines=['🏃 *Cardio*'];
       cardios.filter(e=>e.type||e.duration).forEach((e,i)=>{
-        let line=`  ${i+1}\\. ${mdEsc(e.type||'cardio')}`;
+        let line=`  ${i+1}\\. ${mdEscLine(e.type||'cardio')}`;
         if(e.duration) line+=` — ${mdEsc(e.duration)} min`;
         if(e.km) line+=` — ${mdEsc(e.km)} km`;
         lines.push(line);
-        if(e.notes.trim()) lines.push(`  _${mdEsc(e.notes)}_`);
+        noteLines(e.notes).forEach(l=>lines.push(l));
       });
       msg += '\n\n' + toExpandableQuote(lines);
     }
@@ -987,7 +995,7 @@
         const valid=s.exercises.filter(e=>e.name.trim()); if(!valid.length) return;
         lines.push(`  *Set ${si+1}*`);
         valid.forEach((ex,ei)=>{
-          let line=`  ${ei+1}\\. ${mdEsc(ex.name)}`;
+          let line=`  ${ei+1}\\. ${mdEscLine(ex.name)}`;
           if(ex.duration) line+=` — ${mdEsc(ex.duration)}s`;
           lines.push(line);
         });
