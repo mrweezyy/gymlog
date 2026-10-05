@@ -363,7 +363,7 @@
 <!-- NAVBAR -->
 <div class="navbar">
   <div class="navbar-inner">
-    <div class="logo">gym_log <span style="font-size:10px;color:var(--text-faint);font-weight:400;">v5.14</span></div>
+    <div class="logo">gym_log <span style="font-size:10px;color:var(--text-faint);font-weight:400;">v5.15</span></div>
     <div class="navbar-right">
       <button class="theme-toggle" onclick="toggleTheme()" title="toggle theme"></button>
       <button class="hamburger" onclick="openMenu()"><span></span><span></span><span></span></button>
@@ -593,13 +593,13 @@
         countTowardCycle: document.getElementById('countTowardCycle').checked,
         mains, cardios, cores, uid, overrideDate
       };
-      localStorage.setItem('gymlog_session', JSON.stringify(session));
+      localStorage.setItem('gymlog_u1_session', JSON.stringify(session));
     } catch(e) {}
   }
 
   function restoreSession() {
     try {
-      const raw = localStorage.getItem('gymlog_session');
+      const raw = localStorage.getItem('gymlog_u1_session');
       if (!raw) return false;
       const session = JSON.parse(raw);
       document.getElementById('workoutName').value = session.workoutName || '';
@@ -685,8 +685,8 @@
   function init() {
     const s = getSaved();
     document.getElementById('relaySecret').value = s.relaySecret || '';
-    document.documentElement.setAttribute('data-theme', localStorage.getItem('gymlog_theme')||'light');
-    updateThemeColorMeta(localStorage.getItem('gymlog_theme')||'light');
+    document.documentElement.setAttribute('data-theme', localStorage.getItem('gymlog_u1_theme')||'light');
+    updateThemeColorMeta(localStorage.getItem('gymlog_u1_theme')||'light');
     updateDot();
     const restored = restoreSession();
     renderDateStr();
@@ -744,12 +744,12 @@
     const current = document.documentElement.getAttribute('data-theme');
     const next = current === 'light' ? 'dark' : current === 'dark' ? 'purple' : 'light';
     document.documentElement.setAttribute('data-theme', next);
-    localStorage.setItem('gymlog_theme', next);
+    localStorage.setItem('gymlog_u1_theme', next);
     updateThemeColorMeta(next);
   }
 
   /* CONFIG */
-  function getSaved() { try { return JSON.parse(localStorage.getItem('gymlog_cfg')||'{}'); } catch { return {}; } }
+  function getSaved() { try { return JSON.parse(localStorage.getItem('gymlog_u1_cfg')||'{}'); } catch { return {}; } }
   function getRelaySecret() { return document.getElementById('relaySecret').value.trim() || getSaved().relaySecret || ''; }
   function updateDot() {
     const ok = !!getRelaySecret();
@@ -758,7 +758,7 @@
   }
   function toggleCfg() { document.getElementById('cfgPanel').classList.toggle('open'); }
   function saveCfg() {
-    localStorage.setItem('gymlog_cfg',JSON.stringify({relaySecret:document.getElementById('relaySecret').value.trim()}));
+    localStorage.setItem('gymlog_u1_cfg',JSON.stringify({relaySecret:document.getElementById('relaySecret').value.trim()}));
     document.getElementById('cfgPanel').classList.remove('open');
     updateDot(); showToast('Saved','ok');
     initRemoteSync();
@@ -775,7 +775,7 @@
     mains=[]; cardios=[]; cores=[]; uid=0;
     overrideDate = null;
     renderDateStr();
-    localStorage.removeItem('gymlog_session');
+    localStorage.removeItem('gymlog_u1_session');
     addMain(); addCardio(); addCoreSet();
   }
 
@@ -1134,8 +1134,8 @@
   // cardio, and core sets (template-style), plus notes. "load into logger"
   // drops just the exercise names into today's log — no weights/reps
   // carried over, since those are today's numbers, not the plan's.
-  function loadWorkoutPlans() { try { return JSON.parse(localStorage.getItem('gymlog_workouts')||'[]'); } catch { return []; } }
-  function saveWorkoutPlans(arr) { localStorage.setItem('gymlog_workouts',JSON.stringify(arr)); }
+  function loadWorkoutPlans() { try { return JSON.parse(localStorage.getItem('gymlog_u1_workouts')||'[]'); } catch { return []; } }
+  function saveWorkoutPlans(arr) { localStorage.setItem('gymlog_u1_workouts',JSON.stringify(arr)); }
   function updateWorkoutPlan(id,fn) { const arr=loadWorkoutPlans(),p=arr.find(p=>p.id===id); if(p){fn(p);saveWorkoutPlans(arr);} }
   function addWorkoutPlan() {
     const arr=loadWorkoutPlans(), id=Date.now();
@@ -1150,10 +1150,10 @@
   // from whatever old gymlog_templates / gymlog_planner data exists so
   // nothing gets lost when the two old tabs merge into this one.
   function migrateToWorkoutPlans() {
-    if (localStorage.getItem('gymlog_workouts') !== null) return;
+    if (localStorage.getItem('gymlog_u1_workouts') !== null) return;
     const merged = [];
     try {
-      const templates = JSON.parse(localStorage.getItem('gymlog_templates')||'[]');
+      const templates = JSON.parse(localStorage.getItem('gymlog_u1_templates')||'[]');
       templates.forEach(t => merged.push({
         id: t.id || Date.now()+Math.floor(Math.random()*1000),
         name: t.name || '',
@@ -1164,7 +1164,7 @@
       }));
     } catch {}
     try {
-      const planner = JSON.parse(localStorage.getItem('gymlog_planner')||'[]');
+      const planner = JSON.parse(localStorage.getItem('gymlog_u1_planner')||'[]');
       planner.forEach(d => merged.push({
         id: d.id || Date.now()+Math.floor(Math.random()*1000),
         name: d.name || '',
@@ -1175,7 +1175,7 @@
       }));
     } catch {}
     if (merged.length) saveWorkoutPlans(merged);
-    else localStorage.setItem('gymlog_workouts','[]');
+    else localStorage.setItem('gymlog_u1_workouts','[]');
   }
 
   let wpExpandedIds = new Set();
@@ -1370,9 +1370,9 @@
   /* Manual correction for the current cycle's start date — for when the
      auto-detected day 1 was wrong. Self-expiring (see buildCycles above),
      so it never needs manual cleanup once it's no longer relevant. */
-  function loadCycleOverride() { try { return JSON.parse(localStorage.getItem('gymlog_cycle_override')||'null'); } catch { return null; } }
+  function loadCycleOverride() { try { return JSON.parse(localStorage.getItem('gymlog_u1_cycle_override')||'null'); } catch { return null; } }
   function saveCycleOverride(ov) {
-    try { localStorage.setItem('gymlog_cycle_override', JSON.stringify(ov)); } catch {}
+    try { localStorage.setItem('gymlog_u1_cycle_override', JSON.stringify(ov)); } catch {}
     relayFetch('/cycle-override', { method: 'PUT', body: JSON.stringify(ov) });
   }
 
@@ -1413,7 +1413,7 @@
     const remote = result.override || null;
     const local = loadCycleOverride();
     if (JSON.stringify(remote) !== JSON.stringify(local)) {
-      try { localStorage.setItem('gymlog_cycle_override', JSON.stringify(remote)); } catch {}
+      try { localStorage.setItem('gymlog_u1_cycle_override', JSON.stringify(remote)); } catch {}
       renderWeekBanner();
     }
   }
@@ -1421,9 +1421,9 @@
   /* PLAN — which of the next 7 days (rolling from today) you intend to
      train. Purely a convenience for gating reminders; independent of the
      cycle/streak math above, which only ever looks at actual workout dates. */
-  function loadPlannedDates() { try { return JSON.parse(localStorage.getItem('gymlog_planned_dates')||'[]'); } catch { return []; } }
+  function loadPlannedDates() { try { return JSON.parse(localStorage.getItem('gymlog_u1_planned_dates')||'[]'); } catch { return []; } }
   function savePlannedDates(arr) {
-    try { localStorage.setItem('gymlog_planned_dates', JSON.stringify(arr)); } catch {}
+    try { localStorage.setItem('gymlog_u1_planned_dates', JSON.stringify(arr)); } catch {}
     relayFetch('/plan', { method: 'PUT', body: JSON.stringify(arr) });
   }
 
@@ -1467,7 +1467,7 @@
     const local = loadPlannedDates();
     const merged = [...new Set([...local, ...result.plan])];
     if (merged.length !== local.length) {
-      localStorage.setItem('gymlog_planned_dates', JSON.stringify(merged));
+      localStorage.setItem('gymlog_u1_planned_dates', JSON.stringify(merged));
       renderPlanRow();
     }
   }
@@ -1521,9 +1521,9 @@
     }
   }
 
-  function loadHistory() { try { return JSON.parse(localStorage.getItem('gymlog_history')||'[]'); } catch { return []; } }
+  function loadHistory() { try { return JSON.parse(localStorage.getItem('gymlog_u1_history')||'[]'); } catch { return []; } }
   function saveHistory(h) {
-    try { localStorage.setItem('gymlog_history', JSON.stringify(h)); } catch {}
+    try { localStorage.setItem('gymlog_u1_history', JSON.stringify(h)); } catch {}
     // Push to the relay in the background so other devices pick it up next time
     // they open the app. Non-blocking — local save above already succeeded.
     if (getRelaySecret()) {
@@ -1547,7 +1547,7 @@
         if (a.date !== b.date) return b.date.localeCompare(a.date);
         return (b.id || 0) - (a.id || 0);
       });
-      localStorage.setItem('gymlog_history', JSON.stringify(merged));
+      localStorage.setItem('gymlog_u1_history', JSON.stringify(merged));
       renderWeekBanner();
       if (document.getElementById('page-history').classList.contains('active')) { renderHistory(); renderBig3(); }
       renderCoreExDatalist();
@@ -1689,7 +1689,7 @@
 
   function clearHistory() {
     if (!confirm('Clear all workout history? This cannot be undone.')) return;
-    localStorage.removeItem('gymlog_history');
+    localStorage.removeItem('gymlog_u1_history');
     cancelCompare();
     renderHistory();
     renderCoreExDatalist();
