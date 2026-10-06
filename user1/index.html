@@ -134,6 +134,10 @@
     .cfg-panel input:focus { outline: none; border-color: var(--border-strong); }
     .cfg-save { font-size: 12px; font-family: var(--mono); padding: 7px 16px; border: 1px solid var(--border-strong); border-radius: var(--radius); background: none; color: var(--text); cursor: pointer; }
     .cfg-save:hover { background: var(--bg); }
+    .theme-opts { display: flex; gap: 8px; margin-bottom: 1.5rem; }
+    .theme-opt { flex: 1; font-size: 12px; font-family: var(--mono); padding: 9px 10px; border: 1px solid var(--border-strong); border-radius: var(--radius); background: none; color: var(--text); cursor: pointer; }
+    .theme-opt.active { background: var(--accent); color: var(--accent-fg); border-color: var(--accent); }
+    .tg-warn { display: none; font-size: 12px; font-family: var(--mono); color: var(--red); border: 1px solid var(--red); border-radius: var(--radius); padding: 8px 10px; margin-bottom: 1rem; cursor: pointer; }
 
     /* MAIN EXERCISES */
     .ex-list { display: flex; flex-direction: column; gap: 10px; margin-bottom: 10px; }
@@ -363,9 +367,8 @@
 <!-- NAVBAR -->
 <div class="navbar">
   <div class="navbar-inner">
-    <div class="logo">gym_log <span style="font-size:10px;color:var(--text-faint);font-weight:400;">v5.15</span></div>
+    <div class="logo">gym_log <span style="font-size:10px;color:var(--text-faint);font-weight:400;">v5.18</span></div>
     <div class="navbar-right">
-      <button class="theme-toggle" onclick="toggleTheme()" title="toggle theme"></button>
       <button class="hamburger" onclick="openMenu()"><span></span><span></span><span></span></button>
     </div>
   </div>
@@ -383,6 +386,7 @@
     <button class="menu-item active" id="mi-logger"  onclick="switchPage('logger');closeMenu()"><span class="menu-item-icon">📋</span>gym logger</button>
     <button class="menu-item" id="mi-history"       onclick="switchPage('history');closeMenu()"><span class="menu-item-icon">📊</span>history</button>
     <button class="menu-item" id="mi-workouts"       onclick="switchPage('workouts');closeMenu()"><span class="menu-item-icon">🗂️</span>workouts</button>
+    <button class="menu-item" id="mi-settings"       onclick="switchPage('settings');closeMenu()"><span class="menu-item-icon">⚙️</span>settings</button>
   </div>
 </div>
 
@@ -440,13 +444,9 @@
     <div class="streak-badge" id="streakBadge"></div>
     <div class="plan-row" id="planRow"></div>
     <div class="plan-empty-note" id="planEmptyNote" style="display:none;">Tap the days above you actually plan to train — reminders only fire on those days.</div>
+    <div class="tg-warn" id="tgWarn" onclick="switchPage('settings')"></div>
     <div class="tg-row">
       <div class="tg-block">
-        <div class="tg-status">
-          <div class="tg-dot" id="tgDot"></div>
-          <span class="tg-label" id="tgLabel">telegram connected</span>
-          <button class="tg-change" onclick="toggleCfg()">change</button>
-        </div>
         <div class="date-row" id="dateRow">
         <div class="date-str" id="dateStr" onclick="toggleDateEdit()"></div>
         <div class="date-editor" id="dateEditor" style="display:none;">
@@ -459,15 +459,6 @@
       </div>
     </div>
     </div>
-    <div class="cfg-panel" id="cfgPanel">
-      <label>relay secret</label>
-      <input type="password" id="relaySecret" placeholder="paste your APP_SHARED_SECRET" autocomplete="off">
-      <button class="cfg-save" onclick="saveCfg()">save</button>
-      <div style="height:12px;"></div>
-      <label>calendar</label>
-      <button class="cfg-save" style="background:none;border:1px solid var(--border);color:var(--text);" onclick="rebuildCalendar()">rebuild this month's calendar from history</button>
-    </div>
-
     <div style="margin-bottom:1.5rem;">
       <div class="slabel">session</div>
       <input type="text" id="workoutName" placeholder="push day, legs, pull…" style="margin-bottom:8px;">
@@ -521,6 +512,30 @@
   <div class="page" id="page-workouts">
     <div class="wp-list" id="wpList"></div>
     <button class="add-any-btn" onclick="addWorkoutPlan()">+ new workout</button>
+  </div>
+
+  <!-- PAGE: SETTINGS -->
+  <div class="page" id="page-settings">
+    <div class="slabel">relay</div>
+    <div class="cfg-panel open">
+      <div class="tg-status" style="margin-bottom:12px;">
+        <div class="tg-dot" id="tgDot"></div>
+        <span class="tg-label" id="tgLabel">…</span>
+      </div>
+      <label>relay secret</label>
+      <input type="password" id="relaySecret" placeholder="paste your APP_SHARED_SECRET" autocomplete="off">
+      <button class="cfg-save" onclick="saveCfg()">save</button>
+    </div>
+    <div class="slabel">calendar</div>
+    <div class="cfg-panel open">
+      <button class="cfg-save" style="background:none;border:1px solid var(--border);color:var(--text);" onclick="rebuildCalendar()">rebuild this month's calendar from history</button>
+    </div>
+    <div class="slabel">theme</div>
+    <div class="theme-opts">
+      <button class="theme-opt" id="theme-light" onclick="setTheme('light')">light</button>
+      <button class="theme-opt" id="theme-dark" onclick="setTheme('dark')">dark</button>
+      <button class="theme-opt" id="theme-purple" onclick="setTheme('purple')">purple</button>
+    </div>
   </div>
 
   <div class="page" id="page-history">
@@ -713,12 +728,13 @@
     window.scrollTo(0, 0);
     document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
     document.getElementById('page-'+id).classList.add('active');
-    ['logger','history','workouts'].forEach(n=>{
+    ['logger','history','workouts','settings'].forEach(n=>{
       const el=document.getElementById('mi-'+n);
       if(el) el.classList.toggle('active', n===id);
     });
     if (id==='history') { renderHistory(); renderBig3(); renderMGLegend('mgLegendHist'); }
     if (id==='workouts') { renderWorkoutPlans(); }
+    if (id==='settings') { updateThemeButtons(); }
   }
 
   /* COLLAPSIBLE SECTIONS */
@@ -740,12 +756,15 @@
     const meta = document.getElementById('themeColorMeta');
     if (meta) meta.setAttribute('content', THEME_COLORS[theme] || THEME_COLORS.light);
   }
-  function toggleTheme() {
-    const current = document.documentElement.getAttribute('data-theme');
-    const next = current === 'light' ? 'dark' : current === 'dark' ? 'purple' : 'light';
+  function setTheme(next) {
     document.documentElement.setAttribute('data-theme', next);
     localStorage.setItem('gymlog_u1_theme', next);
     updateThemeColorMeta(next);
+    updateThemeButtons();
+  }
+  function updateThemeButtons() {
+    const cur = document.documentElement.getAttribute('data-theme');
+    ['light','dark','purple'].forEach(t => { const b = document.getElementById('theme-'+t); if (b) b.classList.toggle('active', t === cur); });
   }
 
   /* CONFIG */
@@ -755,11 +774,17 @@
     const ok = !!getRelaySecret();
     document.getElementById('tgDot').className='tg-dot'+(ok?'':' off');
     document.getElementById('tgLabel').textContent=ok?'relay connected':'not configured';
+    setRelayWarn(ok ? '' : 'not configured');
   }
-  function toggleCfg() { document.getElementById('cfgPanel').classList.toggle('open'); }
+  // Small warning on the main screen, only when the relay isn't working.
+  function setRelayWarn(text) {
+    const w = document.getElementById('tgWarn');
+    if (!w) return;
+    w.style.display = text ? 'block' : 'none';
+    w.textContent = text ? '⚠ relay: ' + text + ' — tap to fix in settings' : '';
+  }
   function saveCfg() {
     localStorage.setItem('gymlog_u1_cfg',JSON.stringify({relaySecret:document.getElementById('relaySecret').value.trim()}));
-    document.getElementById('cfgPanel').classList.remove('open');
     updateDot(); showToast('Saved','ok');
     initRemoteSync();
   }
@@ -1536,7 +1561,16 @@
   async function initRemoteSync() {
     if (!getRelaySecret()) return;
     const result = await relayFetch('/history');
-    if (!result.ok || !Array.isArray(result.history)) return;
+    if (!result.ok || !Array.isArray(result.history)) {
+      // Make the status honest: a saved secret isn't the same as a working connection.
+      const lbl = document.getElementById('tgLabel'), dot = document.getElementById('tgDot');
+      if (result.error === 'unauthorized') { dot.className = 'tg-dot off'; lbl.textContent = 'wrong secret'; setRelayWarn('wrong secret'); }
+      else if (result.error === 'network error') { dot.className = 'tg-dot off'; lbl.textContent = 'relay unreachable'; setRelayWarn('unreachable'); }
+      return;
+    }
+    document.getElementById('tgDot').className = 'tg-dot';
+    document.getElementById('tgLabel').textContent = 'relay connected';
+    setRelayWarn('');
 
     const local = loadHistory();
     const localKeys = new Set(local.map(e => `${e.date}|${e.name}|${historyContentKey(e)}`));
@@ -2051,13 +2085,14 @@
   }
 
   /* BIG 3 */
-  // Squat/bench/deadlift PRs, computed straight from logged history —
+  // Squat / bench press / deadlift PRs. Only these exact exercise names count, so
+  // variations (split squat, incline bench, Romanian deadlift...) are left out. Computed from logged history —
   // no manual program data needed. Tracks your all-time PR (heaviest set
   // ever logged) and your most recent session's top set for each lift.
   const BIG3_CONFIG = [
-    { key: 'squat',    label: 'squat',    match: /squat/i,    color: '#0d9488' },
-    { key: 'bench',    label: 'bench',    match: /bench/i,    color: '#e0575a' },
-    { key: 'deadlift', label: 'deadlift', match: /deadlift/i, color: '#3b82f6' }
+    { key: 'squat',    label: 'squat',    match: /^squats?$/i, color: '#0d9488' },
+    { key: 'bench',    label: 'bench',    match: /^(?:flat\s+)?bench\s+press$/i, color: '#e0575a' },
+    { key: 'deadlift', label: 'deadlift', match: /^deadlifts?$/i, color: '#3b82f6' }
   ];
 
   function computeBig3() {
@@ -2067,7 +2102,7 @@
     history.forEach(entry => {
       (entry.mains||[]).forEach(ex => {
         if (!ex.name) return;
-        const cfg = BIG3_CONFIG.find(c => c.match.test(ex.name));
+        const cfg = BIG3_CONFIG.find(c => c.match.test(String(ex.name).trim()));
         if (!cfg) return;
         let best = null;
         (ex.sets||[]).forEach(s => {
